@@ -56,7 +56,7 @@ def closeGate(gateN):
   time.sleep(0.5)
   pwm.set_pwm(gateN,0,pwmV[gateN][3])
 
-def releasall():
+def releaseall():
   for i in range(8):
     pwm.set_pwm(i,0,0)
 
