@@ -1,0 +1,9 @@
+[Unit]
+Description=Arduino-controlled System
+
+[Service]
+Type=idle
+ExecStart=/usr/bin/python3 /usr/lib/mazer-service.py
+
+[Install]
+WantedBy=multi-user.target
