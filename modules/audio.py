@@ -6,7 +6,7 @@ logger=logging.getLogger(__name__)
 
 # using 16 bit sounds
 # pi audio is a one instance class with multiple types of sounds
-class piAudio():
+class MazeAudio():
   def __init__(self):
     self.audios = {}
     self.play_obj = None
@@ -15,15 +15,15 @@ class piAudio():
     self.audios[key] = sound
 
   def play(self,key):
-    self.play_obj = audios[key].play()
+    self.play_obj = self.audios[key].play()
     logger.info('play audio %s',key)
     
   def playBlocking(self,key):
-    self.play_obj = audios[key].play()
+    self.play_obj = self.audios[key].play()
     self.play_obj.wait_done()
 
   def tone(duration=1.0, freq=1000.0, volume=1.0, sample_rate = 44100):
-    sound = rpiAudio.Sound(sample_rate,channels=1)
+    sound = MazeAudio.Sound(sample_rate,channels=1)
     volume = volume
     logger.info('Tone freq = %s Hz, duration = %s s, sample_rate = %s, volume = %s',freq,duration,sample_rate,volume)
   
@@ -55,7 +55,6 @@ class piAudio():
       return play_obj
 
 
-
 if __name__=='__main__':
   import sys,os
   if not os.path.exists('./logs/'):
@@ -71,9 +70,9 @@ if __name__=='__main__':
   logger.info('Audio Test')
 
   sample_rate = 44100
-  audio = rpiAudio()
-  audio.add(1,rpiAudio.tone(duration=1.0,freq=1000.0,volume=1.0,sample_rate=sample_rate))
-  audio.add(2,rpiAudio.tone(duration=1.0,freq=8000.0,volume=1.0,sample_rate=sample_rate))
+  audio = MazeAudio()
+  audio.add(1,MazeAudio.tone(duration=1.0,freq=1000.0,volume=1.0,sample_rate=sample_rate))
+  audio.add(2,MazeAudio.tone(duration=1.0,freq=8000.0,volume=1.0,sample_rate=sample_rate))
   audio.play(1)
   audio.play_obj.wait_done()
   audio.playBlocking(2)
