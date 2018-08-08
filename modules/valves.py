@@ -3,6 +3,8 @@
 import logging
 import time
 
+VALVEVERSION       =  1.0
+
 # Registers/etc:
 ARDUINO_ADDRESS  = 0x60
 #MODE1            = 0x00
@@ -39,7 +41,7 @@ class MazeValves(object):
     self.multidrop=2
     self.dropdelay = 50
     self.multidropdelay = 2 # multiple of 500 ms (2 means 1 seconds)
-    logger.debug('Valves initialized')
+    logger.debug('Valves initialized version %s',VALVEVERSION)
 
   def open(self,key):
     self._device.write8(VALVE_OPEN,self.valves[key].data)
@@ -75,7 +77,7 @@ if __name__ == '__main__':
   logging.basicConfig(filename=logfile,filemode='w+',level=logging.DEBUG,
           format=formatter_str, datefmt=dateformat)
 
-  logger.info('Arduino Test')
+  logger.info('Valve Test')
 
   valves=MazeValves()
   valves.open('L')
