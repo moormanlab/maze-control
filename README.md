@@ -1,8 +1,8 @@
 # rat-maze
-Maze control for behaviuoral rat training
+Maze control for behavioural rat training
 
 
-Install on raspberry pi
+# Install on raspberry pi 3
 
 Mazer-Service
 
