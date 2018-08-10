@@ -1,7 +1,9 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Arduino control for rat maze - V 0.1  2018/08/01
+// Arduino control for rat maze - V 0.2  2018/08/07
 ///////////////////////////////////////////////////////////////////////////////
-//
+#define VERSIONMAY    0
+#define VERSIONMIN    2
+
 #include <Wire.h>  // Library which contains functions to have I2C Communication
 #define SLAVE_ADDRESS 0x60 // Define the I2C address to Communicate to Uno
 // i2c uses A4 and A5
@@ -40,7 +42,7 @@ enum COMMANDS {
   VALVE_CLOSE,              // second byte has valve number
   VALVE_DROP,               // second byte has valve number
   VALVE_MULTIDROP,          // second byte has valve number
-  VALVE_SET_MULTI,          // seconf byte has multidrop number
+  VALVE_SET_MULTINUM,       // seconf byte has multidrop number
   VALVE_SET_DELAYDROP,      // seconf byte has multidrop number
   VALVE_SET_DELAYMULTIDROP, // seconf byte has multidrop number
   TEST1=90,                 // 0x5a 01011010
@@ -306,7 +308,7 @@ Serial.println(raspiState,DEC); //TODO DEBUG
           if (bufferRX[1]=='R') valveDrop(valveRight);
           else if (bufferRX[1]=='L') valveDrop(valveLeft);
           break;
-        case VALVE_SET_MULTI:   // multidrop should be between 2 and 9
+        case VALVE_SET_MULTINUM:   // multidrop should be between 2 and 9
           if ((bufferRX[1]>1) and (bufferRX[1]<10)) 
             multiDrop = bufferRX[1];
           break;
@@ -392,7 +394,10 @@ void setup() {
   Wire.onRequest(raspiSendData);    // function called when Pi requests data
   Wire.onReceive(raspiReceiveData); // function called when Pi sends data
   Serial.begin(9600);  //TODO DEBUG
-  Serial.println("Open");
+  Serial.print("Version ");
+  Serial.print(VERSIONMAY);
+  Serial.print('.');
+  Serial.println(VERSIONMIN);
 
   raspiState = SYS_OFF;
   ledFunction(LED_SLOW_FADE);
