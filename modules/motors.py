@@ -10,7 +10,7 @@ import adai2c as pwm
 # Uncomment to enable debug output.
 #logging.basicConfig(level=logging.DEBUG)
 
-from multiprocessing import Process, Queue, Lock
+from multiprocessing import Process, Queue, Lock, Value
 
 # motor | open       | close       | key | position
 # 0     | 220 -> 222 | 540 -> 534  | IUL | inner upper left 
@@ -34,6 +34,8 @@ from multiprocessing import Process, Queue, Lock
 #       \                  /-\                  /
 #        \----------------/   \----------------/
 
+from ctypes import c_bool,c_int
+
 class MazerMotors(object):
   def __init__(self):
     # Initialise the PCA9685 using the default address (0x40).
@@ -50,15 +52,16 @@ class MazerMotors(object):
     self.motors = {}
     self.queue = Queue()
     for key in self.pwmV:
-        self.motors[key]=MazerMotors._Motor(key=key,index=self.pwmV[key][0],
+        self.motors[key]=MazerMotors.Motor(key=key,index=self.pwmV[key][0],
                 openGoal=self.pwmV[key][1][0],openAfter=self.pwmV[key][1][1],
                 closeGoal=self.pwmV[key][1][2],closeAfter=self.pwmV[key][1][3])
+    logger.info('MazerMotors id %s ',id(self))
 
   def _moveSlow(self,key,goal,after):
     gate = self.motors[key].index
-    now = self.motors[key].position
+    now = self.motors[key].getPosition()
     self.motors[key].lock.acquire()
-    self.motors[key].moving = True
+    self.motors[key].setMoving(True)
     try:
       if goal > now:
           diff = 1
@@ -66,37 +69,45 @@ class MazerMotors(object):
           diff = -1
       #steps = 50
       #diff = int((goal-now)/steps)
-      logger.info('Slow gate %s | now %s | goal %s | after %s | diff %s',gate,now,goal,after,diff)
+      #logger.info('Slow gate %s | now %s | goal %s | after %s | diff %s moving %s',gate,now,goal,after,diff,self.motors[key].isMoving())
       while (goal != now):
         now += diff
         logger.info('gate %s now %s',gate,now)
         self.pwm.set(gate,now)
         time.sleep(0.002)
-        self.motors[key].position = now
+        self.motors[key].setPosition(now)
       self.pwm.set(gate,goal)
-      self.motors[key].position = goal
+      self.motors[key].setPosition(goal)
       time.sleep(0.1)
       self.pwm.set(gate,after)
-      self.motors[key].position = after
+      self.motors[key].setPosition(after)
+      logger.debug('gate %s position after = %s',self.motors[key].index,self.motors[key].getPosition())
+    except Exception as e:
+      print (e)
+      self.motors[key].lock.release()
     finally:
       self.motors[key].lock.release()
-      self.motors[key].moving = False
+      self.motors[key].setMoving(False)
 
   def _moveFast(self,key,goal,after):
     gate = self.motors[key].index
     self.motors[key].lock.acquire()
-    self.motors[key].moving = True
-    now=self.motors[key].position
+    self.motors[key].setMoving(True)
+    now=self.motors[key].getPosition()
     logger.info('Fast gate %s | now %s | goal %s | after %s',gate,now,goal,after)
     try:
       self.pwm.set(gate,goal)
-      self.motors[key].position = goal
+      self.motors[key].setPosition(goal)
       time.sleep(0.5)
       self.pwm.set(gate,after)
-      self.motors[key].position = after
+      self.motors[key].setPosition(after)
+      logger.debug('gate %s position after = %s',self.motors[key].index,self.motors[key].getPosition())
+    except Exception as e:
+      print (e)
+      self.motors[key].lock.release()
     finally:
       self.motors[key].lock.release()
-      self.motors[key].moving = False
+      self.motors[key].setMoving(False)
 
   def openGateFast(self,key):
     logger.debug('openF %s',self.motors[key].index)
@@ -140,6 +151,9 @@ class MazerMotors(object):
       self.motors[key].lock.acquire()
       try:
         self.pwm.set(self.motors[key].index,0)
+      except Exception as e:
+        print (e)
+        self.motors[key].lock.release()
       finally:
         self.motors[key].lock.release()
 
@@ -161,18 +175,36 @@ class MazerMotors(object):
         elif data[0] == 'slow':
           p = Process(target=self._moveSlow,args=(data[1][0],data[1][1],data[1][2],))
         p.start()
+      msg = ""
+      for key in self.motors:
+        msg = msg + "M {index} mv = {isit}|".format(index=self.motors[key].index,isit=self.motors[key].isMoving())
+      logger.debug(msg)
+      time.sleep(0.1)
     
-  class _Motor(object):
+  class Motor(object):
     def __init__(self,key=None,index=None,openGoal=0,openAfter=0,closeGoal=0,closeAfter=0):
+      logger.info('Motors %s id %s ',index,id(self))
       self.key=key
       self.index=index
       self.closeGoal=closeGoal
       self.closeAfter=closeAfter
       self.openGoal=openGoal
       self.openAfter=openAfter
-      self.position=0
       self.lock = Lock()
-      self.moving = False
+      self._position=Value(c_int,0)
+      self._moving = Value(c_bool,False)
+
+    def setPosition(self,val):
+      self._position.value = int(val)
+
+    def getPosition(self):
+      return int(self._position.value)
+
+    def setMoving(self,val):
+      self._moving.value = bool(val)
+
+    def isMoving(self):
+      return bool(self._moving.value)
 
 if __name__ == '__main__':
   import sys,os
@@ -191,13 +223,13 @@ if __name__ == '__main__':
   try:
     p = Process(target=motors.run)
     p.start()
-    time.sleep(2)
+    #time.sleep(2)
     motors.openGateFast('OUL')
-    time.sleep(3)
+    #time.sleep(3)
     motors.closeGateFast('OUL')
-    time.sleep(3)
+    #time.sleep(3)
     motors.closeAll()
-    time.sleep(3)
+    #time.sleep(3)
     motors.testGates()
     motors.releaseAll()
     motors.exit()
