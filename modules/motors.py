@@ -15,45 +15,24 @@ from multiprocessing import Process, Queue, Lock
 # motor | open       | close       | key | position
 # 0     | 220 -> 222 | 540 -> 534  | IUL | inner upper left 
 # 1     | 545 -> 535 | 195 -> 205  | IBL | inner bottom left
-# 2     | 210 -> 215 | 555 -> 545  | OBL | outter bottom left
-# 3     | 545 -> 535 | 200 -> 205  | OUL | outter upper left
-# 4     | 220 -> 222 | 520 -> 510  | OBR | outter bottom right
+# 2     | 210 -> 215 | 555 -> 542  | OBL | outter bottom left
+# 3     | 545 -> 535 | 200 -> 210  | OUL | outter upper left
+# 4     | 520 -> 510 | 220 -> 222  | OBR | outter bottom right
 # 5     | 225 -> 230 | 550 -> 545  | OUR | outter upper right
-# 6     | 195 -> 200 | 510 -> 505  | OBR | inner bottom right
+# 6     | 195 -> 200 | 500 -> 492  | IBR | inner bottom right
 # 7     | 545 -> 540 | 200 -> 205  | IUR | inner upper right
 
-#        /--------------\   /--------------\
-#       /                \-/                \
-#      /   /-----------\     /-----------\   \
-#     |   / OUL     IUL \   / IUR     OUR \   |
-#     |   |             |   |             |   |
-#     |   |             |   |             |   |
-#     |   \ OBL     IBL /   \ IBR     OBR /   |
-#      \   \-----------/     \-----------/   /
-#       \                /-\                /
-#        \--------------/   \--------------/
 
-
-#def openGate(gateN):
-#  pwm.set_pwm(gateN,0,pwmV[gateN][0])
-#  time.sleep(0.5)
-#  pwm.set_pwm(gateN,0,pwmV[gateN][1])
-#
-#def closeGate(gateN):
-#  pwm.set_pwm(gateN,0,pwmV[gateN][2])
-#  time.sleep(0.5)
-#  pwm.set_pwm(gateN,0,pwmV[gateN][3])
-#
-## Helper function to make setting a servo pulse width simpler.
-#def set_servo_pulse(channel, pulse):
-#    pulse_length = 1000000    # 1,000,000 us per second
-#    pulse_length //= 60       # 60 Hz
-#    print('{0}us per period'.format(pulse_length))
-#    pulse_length //= 4096     # 12 bits of resolution
-#    print('{0}us per bit'.format(pulse_length))
-#    pulse *= 1000
-#    pulse //= pulse_length
-#    pwm.set_pwm(channel, 0, pulse)
+#        /----------------\   /----------------\
+#       /                  \-/                  \
+#      /   /-------------\     /-------------\   \
+#     |   / OUL(3) (0)IUL \   / IUR(7) (5)OUR \   |
+#     |   |               |   |               |   |
+#     |   |               |   |               |   |
+#     |   \ OBL(2) (1)IBL /   \ IBR(6) (4)OBR /   |
+#      \   \-------------/     \-------------/   /
+#       \                  /-\                  /
+#        \----------------/   \----------------/
 
 class MazerMotors(object):
   def __init__(self):
@@ -66,7 +45,7 @@ class MazerMotors(object):
                  'OUL': (3,[545, 535, 200, 210]),
                  'OBR': (4,[520, 510, 220, 222]),
                  'OUR': (5,[225, 230, 550, 545]),
-                 'OBR': (6,[195, 200, 500, 492]),
+                 'IBR': (6,[195, 200, 500, 492]),
                  'IUR': (7,[545, 540, 200, 205]) }
     self.motors = {}
     self.queue = Queue()
@@ -87,10 +66,10 @@ class MazerMotors(object):
           diff = -1
       #steps = 50
       #diff = int((goal-now)/steps)
-      logger.info('gate %s | now %s | goal %s | after %s | diff %s',gate,now,goal,after,diff)
+      logger.info('Slow gate %s | now %s | goal %s | after %s | diff %s',gate,now,goal,after,diff)
       while (goal != now):
         now += diff
-        logger.info('gate now %s',now)
+        logger.info('gate %s now %s',gate,now)
         self.pwm.set(gate,now)
         time.sleep(0.002)
         self.motors[key].position = now
@@ -107,6 +86,8 @@ class MazerMotors(object):
     gate = self.motors[key].index
     self.motors[key].lock.acquire()
     self.motors[key].moving = True
+    now=self.motors[key].position
+    logger.info('Fast gate %s | now %s | goal %s | after %s',gate,now,goal,after)
     try:
       self.pwm.set(gate,goal)
       self.motors[key].position = goal
@@ -165,9 +146,9 @@ class MazerMotors(object):
   def testGates(self):
     for key in self.motors:
       self.openGate(key)
-      time.sleep(2)
+      time.sleep(3)
       self.closeGate(key)
-      time.sleep(2)
+      time.sleep(3)
 
   def run(self):
     while True:
@@ -212,16 +193,13 @@ if __name__ == '__main__':
     p.start()
     time.sleep(2)
     motors.openGateFast('OUL')
-    time.sleep(1)
+    time.sleep(3)
     motors.closeGateFast('OUL')
-    time.sleep(1)
-    motors.openGate('OUL')
-    motors.openGate('IUL')
+    time.sleep(3)
     motors.closeAll()
-    motors.openAll()
+    time.sleep(3)
+    motors.testGates()
     motors.releaseAll()
-
-    time.sleep(1)
     motors.exit()
     p.join()
   except:

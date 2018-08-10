@@ -16,11 +16,11 @@ pwm = Adafruit_PCA9685.PCA9685()
 # motor | open       | close       | position
 # 0     | 220 -> 222 | 540 -> 534  | inner upper left
 # 1     | 545 -> 535 | 195 -> 205  | inner lower left
-# 2     | 210 -> 215 | 555 -> 545  | outter lower left
-# 3     | 545 -> 535 | 200 -> 205  | outter upper left
-# 4     | 220 -> 222 | 520 -> 510  | outter lower right
+# 2     | 210 -> 215 | 555 -> 542  | outter lower left
+# 3     | 545 -> 535 | 200 -> 210  | outter upper left
+# 4     | 520 -> 510 | 220 -> 222  | outter lower right
 # 5     | 225 -> 230 | 550 -> 545  | outter upper right
-# 6     | 195 -> 200 | 510 -> 505  | inner lower right
+# 6     | 195 -> 200 | 500 -> 492  | inner lower right
 # 7     | 545 -> 540 | 200 -> 205  | inner upper right
 
 print('1.5')
@@ -100,9 +100,9 @@ def releaseAll():
 def testGates():
   for i in range(8):
     openGate(i)
-    time.sleep(2)
+    time.sleep(1)
     closeGate(i)
-    time.sleep(2)
+    time.sleep(1)
 
 # Helper function to make setting a servo pulse width simpler.
 def set_servo_pulse(channel, pulse):
@@ -133,6 +133,7 @@ if __name__ == '__main__':
 
   logger.info('Motor test')
   closeAll()
-  openGateSlow(1)
-  closeGateSlow(1)
+  testGates()
+#  openGateSlow(1)
+#  closeGateSlow(1)
   releaseAll()
