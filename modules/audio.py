@@ -7,33 +7,27 @@ logger=logging.getLogger(__name__)
 # using 16 bit sounds
 # pi audio is a one instance class with multiple types of sounds
 
-
-class Sound():
-  def __init__(self,sample_rate=0, channels=1, buff=None):
-    self.sample_rate=sample_rate
-    self.channels=channels
-    self.buff=None
-    #self.duration=0  #only for info should be len(buff)/samplerate
-
-  def play(self):
-    play_obj = sa.play_buffer(self.buff, self.channels, 2, self.sample_rate)
-    return play_obj
-
 class MazeSounds():
   def __init__(self):
     self.sound = {}
     self.play_obj = None
 
   def play(self,key):
-    self.play_obj = self.audio[key].play()
+    self.play_obj = self.sound[key].play()
     logger.info('play audio %s',key)
     
   def playBlocking(self,key):
-    self.play_obj = self.audio[key].play()
+    self.play_obj = self.sound[key].play()
     logger.info('play audio %s',key)
     self.play_obj.wait_done()
 
-  def addTone(key,duration=1.0, freq=1000.0, volume=1.0, sample_rate = 44100):
+  def isPlaying(self):
+    if self.play_obj is None:
+        return False
+    else:
+        return self.play_obj.is_playing()
+
+  def addTone(self,key,duration=1.0, freq=1000.0, volume=1.0, sample_rate = 44100):
     volume = volume
     logger.info('Sound %s : Tone freq = %s Hz, duration = %s s, sample_rate = %s, volume = %s',key,freq,duration,sample_rate,volume)
   
@@ -43,28 +37,29 @@ class MazeSounds():
   
     # generate sine wave notes
     buff = np.sin(freq * t * 2 * np.pi)
+    logger.debug(str(buff))
   
     # normalize to 16-bit range
     buff *= 32767 * volume / np.max(np.abs(buff)) 
     # convert to 16-bit data
     buff = buff.astype(np.int16)
-    self.sound[key] = Sound(sample_rate,channels=1,buff=buff)
-    logger.debug(str(self.sound[key].buffer))
+    self.sound[key] = sa.WaveObject(buff,1,2,sample_rate)
+    logger.debug(str(buff))
 
-  def addBufferSound(buff=buff, sample_rate = 44100):
+  def addBufferSound(self,key,buff, sample_rate = 44100):
     ''' 
        buff should be a numpy array of np.int16 
        with one or two dimensions (mono or stereo)
     '''
-    logger.info('Tone freq = %s Hz, duration = %s s, sample_rate = %s, volume = %s',freq,duration,sample_rate,volume)
+    logger.info('Custom sound channels %s',len(buff))
     # convert to 16-bit data
     buff = buff.astype(np.int16)
     if len(buff)==2:
       chan = 2
     else:
       chan = 1
-    self.sound[key] = Sound(sample_rate = sample_rate,channels=chan,buff=buff)
-    logger.debug(str(self.sound[key].buff))
+    self.sound[key] = sa.WaveObject(buff,chan,2,sample_rate)
+    logger.debug(str(buff))
 
 
 if __name__=='__main__':
@@ -82,17 +77,26 @@ if __name__=='__main__':
   logger.info('Audio Test')
 
   sample_rate = 44100
-  audio = MazeAudio()
-  audio.addTone(1,duration=1.0,freq=1000.0,volume=1.0,sample_rate=sample_rate)
-  audio.addTone(2,duration=1.0,freq=8000.0,volume=1.0,sample_rate=sample_rate)
+  audio = MazeSounds()
+  audio.addTone(key=1,duration=1.0,freq=1000.0,volume=1.0,sample_rate=sample_rate)
+  audio.addTone(key=2,duration=1.0,freq=8000.0,volume=1.0,sample_rate=sample_rate)
   
-  buff = np.array([np.sin(1000 * 44100 * 2 * np.pi),np.sin(4000 * 44100 * 2 * np.pi)])
+  t = np.linspace(0, 2.0, int(2.0 * sample_rate), False)
+  buff = np.array([np.sin(1000 * t * 2 * np.pi),np.sin(4000 * t * 2 * np.pi)])
+  logger.debug(str(buff))
   buff *= 32767 / np.max(np.abs(buff)) 
+  logger.debug(str(buff))
   buff = buff.astype(np.int16)
-  audio.addBufferSound(3,buff=buff,sample_rate=sample_rate)
+  logger.debug(str(buff))
+  audio.addBufferSound(3,buff,sample_rate)
+  print(audio.isPlaying())
   audio.play(1)
+  print(audio.isPlaying())
   audio.play_obj.wait_done()
   audio.playBlocking(2)
+  print(audio.isPlaying())
   audio.play(3)
+  print(audio.isPlaying())
+  audio.play_obj.wait_done()
 
 
