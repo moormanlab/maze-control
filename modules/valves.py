@@ -25,6 +25,14 @@ VALVE_SET_DELAYMULTIDROP   = 0x0a
 
 logger = logging.getLogger(__name__)
 
+valves = {'L':['Left',ord('L')],
+          'R':['Right',ord('R')]
+          }
+
+class Valve():
+  def __init__(self,name,data):
+    self.name = name
+    self.data = data
 
 class MazeValves(object):
   """PCA9685 PWM LED/servo controller."""
@@ -36,18 +44,18 @@ class MazeValves(object):
       i2c = I2C
     self._device = i2c.get_i2c_device(address, **kwargs)
     self.valves = {}
-    self.valves['L'] = MazeValves.Valve('Left',ord('L'))
-    self.valves['R'] = MazeValves.Valve('Right',ord('R'))
+    for key in valves:
+      self.valve[key] = Valve(valves[key][0],valves[key][1])
     self.multidrop=2
     self.dropdelay = 50
     self.multidropdelay = 2 # multiple of 500 ms (2 means 1 seconds)
-    logger.debug('Valves initialized version %s',VALVEVERSION)
+    logger.debug('Valves initialized version %s with id %s',VALVEVERSION,id(self))
 
   def open(self,key):
-    self._device.write8(VALVE_OPEN,self.valves[key].data)
+    self._device.write8(VALVE_OPEN,self.valve[key].data)
 
   def close(self,key):
-    self._device.write8(VALVE_CLOSE,self.valves[key].data)
+    self._device.write8(VALVE_CLOSE,self.valve[key].data)
 
   def setDropDelay(self,num):
     self.dropdelay = num
@@ -58,12 +66,17 @@ class MazeValves(object):
     self._device.write8(VALVE_SET_MULTINUM,num)
 
   def setMultidropsDelay(self,num):
+    self.multidropdelay = num
     self._device.write8(VALVE_SET_DELAYMULTIDROP,num)
 
-  class Valve():
-    def __init__(self,name,data):
-      self.name = name
-      self.data = data
+  def getDropDelay(self):
+    return self.dropdelay
+
+  def getMultidropsNum(self):
+    return self.multidrop
+
+  def getMultidropsDelay(self):
+    return self.multidropdelay
 
 if __name__ == '__main__':
   import sys,os
