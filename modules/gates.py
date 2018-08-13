@@ -17,7 +17,7 @@ from multiprocessing import Process, Queue, Lock, Value
 # 0     | 220 -> 222 | 540 -> 534  | IUL | inner upper left 
 # 1     | 545 -> 535 | 195 -> 205  | IBL | inner bottom left
 # 2     | 210 -> 215 | 555 -> 542  | OBL | outter bottom left
-# 3     | 545 -> 535 | 200 -> 210  | OUL | outter upper left
+# 3     | 545 -> 542 | 200 -> 210  | OUL | outter upper left
 # 4     | 520 -> 510 | 220 -> 222  | OBR | outter bottom right
 # 5     | 225 -> 230 | 550 -> 545  | OUR | outter upper right
 # 6     | 195 -> 200 | 500 -> 492  | IBR | inner bottom right
@@ -37,21 +37,23 @@ from multiprocessing import Process, Queue, Lock, Value
 
 from ctypes import c_bool,c_int
 
-pwmV = {'IUL': (0,[220, 222, 540, 534]),
-        'IBL': (1,[545, 535, 195, 205]),
-        'OBL': (2,[210, 215, 555, 542]),
-        'OUL': (3,[545, 535, 200, 210]),
+pwmV = {'IUL': (0,[218, 228, 537, 530]),
+        'IBL': (1,[545, 528, 195, 210]),
+        'OBL': (2,[210, 220, 555, 544]),
+        'OUL': (3,[570, 552, 206, 213]),
         'OBR': (4,[520, 510, 220, 222]),
         'OUR': (5,[225, 230, 550, 545]),
         'IBR': (6,[195, 200, 500, 492]),
         'IUR': (7,[545, 540, 200, 205]) }
+
+
 
 class Motor(object):
   def __init__(self,index=None):
     logger.info('Motors %s id %s ',index,id(self))
     self.index=index
     self.pwm = pwm.AdaI2C()
-    self._position=Value(c_int,0)
+    self._position=Value(c_int,380) #start at middle point
 
   def setPosition(self,val):
     self.pwm.set(self.index,val)
@@ -83,7 +85,7 @@ class Gate(object):
   def isOpen(self):
     return self.motor.getPosition()==self.openAfter
 
-  def isiClose(self):
+  def isClose(self):
     return self.motor.getPosition()==self.closeAfter
 
   def _moveSlow(self,goal,after):
@@ -98,15 +100,16 @@ class Gate(object):
           diff = -1
       #steps = 50
       #diff = int((goal-now)/steps)
-      #logger.info('Slow gate %s | now %s | goal %s | after %s | diff %s moving %s',gate,now,goal,after,diff,self.motors[key].isMoving())
       while (goal != now):
         now += diff
-        logger.info('gate %s now %s',self.name,now)
+        logger.debug('gate %s now %s',self.name,now)
+        if now < 10 or now > 600:
+          raise NameError('pwm value exceeded maximum safe value')
         self.motor.setPosition(now)
-        time.sleep(0.002)
+        time.sleep(0.0001)
         #self.motors[key].setPosition(now)
       self.motor.setPosition(goal)
-      time.sleep(0.1)
+      time.sleep(0.05)
       self.motor.setPosition(after)
       logger.debug('gate %s position after = %s',self.name,self.motor.getPosition())
     except Exception as e:
@@ -122,7 +125,7 @@ class Gate(object):
     logger.debug('started move Fast %s',self.name)
     self.setMoving(True)
     now=self.motor.getPosition()
-    logger.info('Fast gate %s | now %s | goal %s | after %s',self.name,now,goal,after)
+    logger.debug('Fast gate %s | now %s | goal %s | after %s',self.name,now,goal,after)
     try:
       self.motor.setPosition(goal)
       time.sleep(0.5)
@@ -168,6 +171,7 @@ class MazeGates(object):
                 openGoal=pwmV[key][1][0],openAfter=pwmV[key][1][1],
                 closeGoal=pwmV[key][1][2],closeAfter=pwmV[key][1][3])
     logger.info('MazerMotors id %s ',id(self))
+    print('1.5')
 
   def _emptyQ(self):
     while self.queue.empty() is not True:
@@ -187,37 +191,51 @@ class MazeGates(object):
 
   def closeGate(self,key):
     logger.debug('command closeS %s',key)
-    self.queue.put(['os',key])
+    self.queue.put(['cs',key])
 
   def isMoving(self,key):
     return self.gate[key].isMoving()
 
   def isOpen(self,key):
-    return self.gate[key].isClose()
+    return self.gate[key].isOpen()
 
   def isClose(self,key):
-    return self.gate[key].isOpen()
+    return self.gate[key].isClose()
 
   def exit(self):
     self.queue.put(['exit'])
 
   def openAll(self):
-    self._emptyQ()
+    #self._emptyQ()
     logger.debug('command open all')
     for key in self.gate:
-      self.openGateFast(key)
+      self.openGate(key)
 
   def closeAll(self):
-    self._emptyQ()
+    #self._emptyQ()
     logger.debug('command close all')
     for key in self.gate:
-      self.closeGateFast(key)
+      self.closeGate(key)
+
+  def openAllFast(self):
+    #self._emptyQ()
+    logger.debug('command open all fast')
+    for key in self.gate:
+      self.openGateFast(key)
 
   def releaseAll(self):
     self._emptyQ()
     logger.debug('close all')
     for key in self.gate:
       self.gate[key]._release()
+
+  def testAllOnce(self):
+    for key in self.gate:
+      self.openGate(key)
+    time.sleep(2)
+    for key in self.gate:
+      self.closeGate(key)
+    time.sleep(2)
 
   def testGates(self):
     for key in self.gate:
@@ -230,6 +248,7 @@ class MazeGates(object):
     while True:
       if self.queue.empty() is not True:
         data = self.queue.get()
+        logger.debug('new data %s',data)
         if data[0] == 'exit':
           break
         elif data[0] == 'of':
@@ -238,12 +257,25 @@ class MazeGates(object):
           p = Process(target=self.gate[data[1]].closeGateFast)
         elif data[0] == 'os':
           p = Process(target=self.gate[data[1]].openGate)
-        elif data[0] == 'oc':
+        elif data[0] == 'cs':
           p = Process(target=self.gate[data[1]].closeGate)
+        else:
+          raise NameError('Messege not implemented')
         p.start()
-      msg = ""
+      msg = "Moving: "
       for key in self.gate:
-        msg = msg + "M {index} mv = {isit}|".format(index=key,isit=self.isMoving(key))
+        if self.isMoving(key):
+          msg = msg + "{index} ".format(index=key)
+      logger.debug(msg)
+      msg = "Open: "
+      for key in self.gate:
+        if self.isOpen(key):
+          msg = msg + "{index} ".format(index=key)
+      logger.debug(msg)
+      msg = "Close: "
+      for key in self.gate:
+        if self.isClose(key):
+          msg = msg + "{index} ".format(index=key)
       logger.debug(msg)
       time.sleep(0.1)
     
@@ -266,18 +298,22 @@ if __name__ == '__main__':
     p = Process(target=gates.run)
     p.start()
     time.sleep(0.5)
-    gates.openGateFast('OUL')
-    gates.openGate('IUL')
-    gates.openGate('IBL')
-    time.sleep(1.5)
-    gates.closeGateFast('OUL')
+    gates.openGateFast('IUL')
+    gates.openGateFast('IUL')
+    gates.openGate('IUR')
+    while gates.isOpen('IUR') == False:
+        pass
+    gates.closeGateFast('IUL')
     time.sleep(1.5)
     gates.closeAll()
-    time.sleep(1.5)
+    while gates.isClose('IUR') == False:
+        pass
+    while gates.isClose('IUL') == False:
+        pass
     gates.testGates()
-    time.sleep(0.1)
-    gates.releaseAll()
+    gates.testAllOnce()
     time.sleep(1.5)
+    gates.releaseAll()
     gates.exit()
     p.join()
   except:
