@@ -6,6 +6,7 @@ import logging
 
 logger=logging.getLogger(__name__)
 
+#import modules.adai2c as pwm
 import adai2c as pwm
 # Uncomment to enable debug output.
 #logging.basicConfig(level=logging.DEBUG)
@@ -78,6 +79,12 @@ class Gate(object):
 
   def isMoving(self):
     return bool(self._moving.value)
+
+  def isOpen(self):
+    return self.motor.getPosition()==self.openAfter
+
+  def isiClose(self):
+    return self.motor.getPosition()==self.closeAfter
 
   def _moveSlow(self,goal,after):
     self.lock.acquire()
@@ -162,6 +169,10 @@ class MazeGates(object):
                 closeGoal=pwmV[key][1][2],closeAfter=pwmV[key][1][3])
     logger.info('MazerMotors id %s ',id(self))
 
+  def _emptyQ(self):
+    while self.queue.empty() is not True:
+      data = self.queue.get()
+
   def openGateFast(self,key):
     logger.debug('command openF %s',key)
     self.queue.put(['of',key])
@@ -178,20 +189,32 @@ class MazeGates(object):
     logger.debug('command closeS %s',key)
     self.queue.put(['os',key])
 
+  def isMoving(self,key):
+    return self.gate[key].isMoving()
+
+  def isOpen(self,key):
+    return self.gate[key].isClose()
+
+  def isClose(self,key):
+    return self.gate[key].isOpen()
+
   def exit(self):
     self.queue.put(['exit'])
 
   def openAll(self):
+    self._emptyQ()
     logger.debug('command open all')
     for key in self.gate:
       self.openGateFast(key)
 
   def closeAll(self):
+    self._emptyQ()
     logger.debug('command close all')
     for key in self.gate:
       self.closeGateFast(key)
 
   def releaseAll(self):
+    self._emptyQ()
     logger.debug('close all')
     for key in self.gate:
       self.gate[key]._release()
@@ -199,9 +222,9 @@ class MazeGates(object):
   def testGates(self):
     for key in self.gate:
       self.openGate(key)
-      time.sleep(1)
+      time.sleep(2)
       self.closeGate(key)
-      time.sleep(1)
+      time.sleep(2)
 
   def run(self):
     while True:
@@ -220,7 +243,7 @@ class MazeGates(object):
         p.start()
       msg = ""
       for key in self.gate:
-        msg = msg + "M {index} mv = {isit}|".format(index=self.gate[key].name,isit=self.gate[key].isMoving())
+        msg = msg + "M {index} mv = {isit}|".format(index=key,isit=self.isMoving(key))
       logger.debug(msg)
       time.sleep(0.1)
     
@@ -242,15 +265,19 @@ if __name__ == '__main__':
   try:
     p = Process(target=gates.run)
     p.start()
-    #time.sleep(2)
+    time.sleep(0.5)
     gates.openGateFast('OUL')
-    #time.sleep(3)
+    gates.openGate('IUL')
+    gates.openGate('IBL')
+    time.sleep(1.5)
     gates.closeGateFast('OUL')
-    #time.sleep(3)
+    time.sleep(1.5)
     gates.closeAll()
-    #time.sleep(3)
+    time.sleep(1.5)
     gates.testGates()
+    time.sleep(0.1)
     gates.releaseAll()
+    time.sleep(1.5)
     gates.exit()
     p.join()
   except:

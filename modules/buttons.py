@@ -6,15 +6,15 @@ import logging
 
 logger=logging.getLogger(__name__)
 
-import adai2c as pwm
+import modules.adai2c as pwm
 # Uncomment to enable debug output.
 #logging.basicConfig(level=logging.DEBUG)
 
 
-buttons = {'B':[17,15,'blue'],
-           'W':[17,14,'white'],
-           'Y':[17,13,'yellow'],
-           'G':[17,12,'green']
+buttons = {'B':[12,15,'blue'],
+           'W':[13,12,'white'],
+           'Y':[5,14,'yellow'],
+           'G':[6,13,'green']
            }
 
 
@@ -30,13 +30,17 @@ class Button(object):
     self.ledN=ledN
     self.pwm = pwm.AdaI2C()
     self.color = color
-    print(" gpiozero button %s id %d" , self.color, id(self.button))
+    logger.debug(" gpiozero button %s id %d", self.color, id(self.button))
 
   def ledPwm(self,value):
-    self.pwm.set(self.ledN,value)
+    if value > 1.0:
+        value = 1.0
+    elif value < 0.0:
+        value = 0.0
+    self.pwm.set(self.ledN,int(value*4095))
 
   def ledOn(self):
-    self.pwm.set(self.ledN,1024)
+    self.pwm.set(self.ledN,4095)
 
   def ledOff(self):
     self.pwm.set(self.ledN,0)
@@ -51,17 +55,19 @@ class MazeButtons(object):
     self.button = {}
     for key in buttons:
       self.button[key] = Button(gpioN=buttons[key][0],ledN=buttons[key][1],color=buttons[key][2])
-      print(" button %s id %d" , key, id(self.button[key]))
       
     logger.info('MazeButtons id %s ',id(self))
 
   def setLedOn(self,key):
+    logger.info('New Led %s on',self.button[key].color)
     self.button[key].ledOn()
 
   def setLedOff(self,key):
+    logger.info('New Led %s off',self.button[key].color)
     self.button[key].ledOff()
 
   def setLedPwm(self,key,val):
+    logger.info('New Led %s pwm %s',self.button[key].color,val)
     self.button[key].ledPwm(val)
 
   def isPressed(self,key):
@@ -82,6 +88,4 @@ if __name__ == '__main__':
   logger.info('Buttons test')
   bt = MazeButtons()
 
-  print(bt.button['B'].isPressed())
-  gpiozero.Button.change(bt.button['B'].button)
   print(bt.button['B'].isPressed())
