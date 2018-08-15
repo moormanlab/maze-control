@@ -1,11 +1,17 @@
-import time
-import logging
+# Interface to use only one instance for Adafruit_PCA9685
+# Author: Ariel Burman
 
+ADAVERSION = 1.0
+
+import time
+from multiprocessing import Lock
+
+import logging
 logger=logging.getLogger(__name__)
 
 # Import the PCA9685 module.
 import Adafruit_PCA9685
-from multiprocessing import Process, Lock
+#import modules.Adafruit_PCA9685 as Adafruit_PCA9685
 
 class AdaI2C(object):
   class __impl:
@@ -15,7 +21,8 @@ class AdaI2C(object):
       # Set frequency to 60hz, good for servos.
       self.pwm.set_pwm_freq(60)
       self.lock = Lock()
-      logger.info("initializing adai2c with id %s",id(self))
+      logger.debug('Initializing adai2c with id %s',id(self))
+      logger.info('AdaI2C version {a}'.format(a=ADAVERSION))
       
     def set(self,number,pwm):
       logger.debug("setting pwm %s, with value %s, id %s",number,pwm,id(self))
@@ -50,6 +57,7 @@ class AdaI2C(object):
     
 
 if __name__ == '__main__':
+  from multiprocessing import Process
   import sys,os
   if not os.path.exists('./logs/'):
     os.makedirs('./logs/')

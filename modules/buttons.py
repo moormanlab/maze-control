@@ -1,14 +1,17 @@
 # Button control for maze
 # Author: Ariel Burman
 
-import time
-import logging
+BUTTONSVERSION = 1.0
 
+import time
+
+import logging
 logger=logging.getLogger(__name__)
 
-import modules.adai2c as pwm
-# Uncomment to enable debug output.
-#logging.basicConfig(level=logging.DEBUG)
+import adai2c as pwm
+#import modules.adai2c as pwm
+import gpiozero
+#import modules.gpiozero as gpiozero
 
 
 buttons = {'B':[12,15,'blue'],
@@ -18,11 +21,7 @@ buttons = {'B':[12,15,'blue'],
            }
 
 
-import gpiozero
-
-#from multiprocessing import Process, Queue, Lock, Value
-
-class Button(object):
+class ledButton(object):
   def __init__(self,gpioN=0,ledN=0,color=''):
     logger.info('Button connected to gpio %s with led %s is color %s id %s ',gpioN,ledN,color,id(self))
     self.button=gpiozero.Button(gpioN,pull_up=True,bounce_time=0.2,hold_time=0.4,hold_repeat=False)
@@ -51,12 +50,11 @@ class Button(object):
 
 class MazeButtons(object):
   def __init__(self):
-    # Initialise the PCA9685 using the default address (0x40).
     self.button = {}
     for key in buttons:
-      self.button[key] = Button(gpioN=buttons[key][0],ledN=buttons[key][1],color=buttons[key][2])
-      
-    logger.info('MazeButtons id %s ',id(self))
+      self.button[key] = ledButton(gpioN=buttons[key][0],ledN=buttons[key][1],color=buttons[key][2])
+    logger.debug('MazeButtons id %s ',id(self))
+    logger.info('Buttons version {a}'.format(a=BUTTONSVERSION))
 
   def setLedOn(self,key):
     logger.info('New Led %s on',self.button[key].color)
@@ -88,4 +86,9 @@ if __name__ == '__main__':
   logger.info('Buttons test')
   bt = MazeButtons()
 
-  print(bt.button['B'].isPressed())
+  while True:
+      msg = ''
+      for i in bt.button:
+          msg = msg + str(i) + '=' + str(bt.isPressed(i)) + '|'
+      logger.info(msg)
+      time.sleep(2)

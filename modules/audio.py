@@ -1,7 +1,12 @@
-import logging
+# Sounds for maze
+# Author: Ariel Burman
+
+SOUNDSVERSION = 1.0
+
 import numpy as np
 import simpleaudio as sa
 
+import logging
 logger=logging.getLogger(__name__)
 
 # using 16 bit sounds
@@ -11,6 +16,8 @@ class MazeSounds():
   def __init__(self):
     self.sound = {}
     self.play_obj = None
+    logger.debug('Maze Sounds id %s ',id(self))
+    logger.info('Sounds version {a}'.format(a=SOUNDSVERSION))
 
   def play(self,key):
     self.play_obj = self.sound[key].play()
@@ -74,7 +81,7 @@ if __name__=='__main__':
   logging.basicConfig(filename=logfile,filemode='w+',level=logging.DEBUG,
           format=formatter_str, datefmt=dateformat)
 
-  logger.info('Audio Test')
+  logger.info('Sound Test')
 
   sample_rate = 44100
   audio = MazeSounds()

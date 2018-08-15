@@ -1,9 +1,12 @@
+# Valves control for maze
 # Author: Ariel Burman
-#
-import logging
+
+VALVEVERSION     = 1.0
+
 import time
 
-VALVEVERSION       =  1.0
+import logging
+logger = logging.getLogger(__name__)
 
 # Registers/etc:
 ARDUINO_ADDRESS  = 0x60
@@ -21,9 +24,6 @@ VALVE_SET_DELAYMULTIDROP   = 0x0a
 #TEST1            = 0x5a  #90  // 0x5a 01011010
 #TEST2            = 0xa5  #165 // 0xa5 10100101
 
-# Bits:
-
-logger = logging.getLogger(__name__)
 
 valves = {'L':['Left',ord('L')],
           'R':['Right',ord('R')]
@@ -49,7 +49,8 @@ class MazeValves(object):
     self.multidrop=2
     self.dropdelay = 50
     self.multidropdelay = 2 # multiple of 500 ms (2 means 1 seconds)
-    logger.debug('Valves initialized version %s with id %s',VALVEVERSION,id(self))
+    logger.debug('Valves initialized with id %s',id(self))
+    logger.info('Valves version {a}'.format(a=VALVEVERSION))
 
   def open(self,key):
     self._device.write8(VALVE_OPEN,self.valve[key].data)

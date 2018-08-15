@@ -1,17 +1,17 @@
-# Motor control for maze
+# Gates control for maze
 # Author: Ariel Burman
 
-import time
-import logging
+GATEVERSION = 1.0
 
+import time
+from multiprocessing import Process, Queue, Lock, Value
+from ctypes import c_bool,c_int
+
+import logging
 logger=logging.getLogger(__name__)
 
-#import modules.adai2c as pwm
-import adai2c as pwm
-# Uncomment to enable debug output.
-#logging.basicConfig(level=logging.DEBUG)
-
-from multiprocessing import Process, Queue, Lock, Value
+import modules.adai2c as pwm
+#import adai2c as pwm
 
 # motor | open       | close       | key | position
 # 0     | 220 -> 222 | 540 -> 534  | IUL | inner upper left 
@@ -35,7 +35,6 @@ from multiprocessing import Process, Queue, Lock, Value
 #       \                  /-\                  /
 #        \----------------/   \----------------/
 
-from ctypes import c_bool,c_int
 
 pwmV = {'IUL': (0,[218, 228, 537, 530]),
         'IBL': (1,[545, 528, 195, 210]),
@@ -47,10 +46,9 @@ pwmV = {'IUL': (0,[218, 228, 537, 530]),
         'IUR': (7,[545, 540, 200, 205]) }
 
 
-
 class Motor(object):
   def __init__(self,index=None):
-    logger.info('Motors %s id %s ',index,id(self))
+    logger.debug('Motors %s id %s ',index,id(self))
     self.index=index
     self.pwm = pwm.AdaI2C()
     self._position=Value(c_int,380) #start at middle point
@@ -166,12 +164,13 @@ class MazeGates(object):
     # Set frequency to 60hz, good for servos.
     self.gate = {}
     self.queue = Queue()
+#    self.processRunning = []
     for key in pwmV:
         self.gate[key]=Gate(name=key,index=pwmV[key][0],
                 openGoal=pwmV[key][1][0],openAfter=pwmV[key][1][1],
                 closeGoal=pwmV[key][1][2],closeAfter=pwmV[key][1][3])
-    logger.info('MazerMotors id %s ',id(self))
-    print('1.5')
+    logger.debug('Maze Gates id %s ',id(self))
+    logger.info('Gates version {a}'.format(a=GATEVERSION))
 
   def _emptyQ(self):
     while self.queue.empty() is not True:
@@ -246,6 +245,10 @@ class MazeGates(object):
 
   def run(self):
     while True:
+#      for p in self.proccess:
+#        if p.
+      
+
       if self.queue.empty() is not True:
         data = self.queue.get()
         logger.debug('new data %s',data)
@@ -262,6 +265,9 @@ class MazeGates(object):
         else:
           raise NameError('Messege not implemented')
         p.start()
+#        print(id(p))
+#        self.processrunning.append(p)
+
       msg = "Moving: "
       for key in self.gate:
         if self.isMoving(key):

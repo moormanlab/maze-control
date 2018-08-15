@@ -1,11 +1,15 @@
 # Sensors control for maze
 # Author: Ariel Burman
-import time
-import logging
 
+SENSORVERSION = 1.0
+
+import time
+
+import logging
 logger=logging.getLogger(__name__)
 
 import gpiozero
+#import modules.gpiozero as gpiozero
 
 
 #        /---------------\   /---------------\
@@ -30,9 +34,6 @@ sensors = {'UL':18,
            'R':22
            }
 
-
-import gpiozero
-
 class Sensor(object):
   def __init__(self,gpioN=0, whenP = None):
     logger.info('Sensor connected to gpio %s with id %s',gpioN,id(self))
@@ -50,8 +51,9 @@ class MazeSensors(object):
     for key in sensors:
       self.sensor[key] = Sensor(gpioN=sensors[key] , whenP = self._sensorsHandler)
       logger.debug(' button {a} id {b}'.format(a=key, b=id(self.sensor[key])))
-      
-    logger.info('MazeSensors id %s ',id(self))
+
+    logger.debug('MazeSensors id %s ',id(self))
+    logger.info('Sensors version {a}'.format(a=SENSORVERSION))
 
   def _sensorsHandler(self):
     if self.isPressed('C'):
