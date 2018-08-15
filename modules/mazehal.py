@@ -17,13 +17,13 @@ from modules.sensors import MazeSensors
 
 class MazeHal():
 
-    def __init__(self,queueCommands,queueResponses):
+    def __init__(self,queueCommands,queueResponses,sensorHandler=None,buttonHandler=None):
         self.qC = queueCommands
         self.qR = queueResponses
 #        self.p = []
 #        self.valves = MazeValves()
-        self.buttons = MazeButtons()
-        self.sensors = MazeSensors()
+        self.buttons = MazeButtons(buttonHandler)
+        self.sensors = MazeSensors(sensorHandler)
         self.subject = None
         self.gates = MazeGates()
         self.gatesP=Process(target=self.gates.run)
@@ -45,12 +45,14 @@ class MazeHal():
                         self.gates.openAll()
                     elif msg[1] == 'open':
                         self.gates.openGate(msg[2])
-                    
+                if msg[0] == 'sensor':
+                    resp = self.sensors.isPressed(msg[1])
+                    self.qR.put(['sensor',resp])
                 if msg[0] == 'exit':
                   break
-            else:
-                print('cola vacia')
-            time.sleep(1)
+            #else:
+            #    print('cola vacia')
+            time.sleep(.1)
 
             # si es una accion, enviar el comando a la clase correspondiente, que deberian ser procesos independientes
             # pero el sistema seguira funcionando

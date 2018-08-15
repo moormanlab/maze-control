@@ -16,7 +16,7 @@ class MazeProtocols(object):
    
 
   def lastSensorActive(self):
-    self.qC.put(['sensors','last'])
+    self.qC.put(['sensor','last'])
     while self.qR.empty():
       time.sleep(1)
       print('bloqued')
@@ -24,6 +24,15 @@ class MazeProtocols(object):
     a = self.qR.get()
     return a
 
+  def isSensorActive(self,key):
+    self.qC.put(['sensor',key])
+    while self.qR.empty():
+      time.sleep(.1)
+    a = self.qR.get()
+    if a[0]=='sensor':
+      return a[1]
+    else:
+      raise NameError('error insesperado')
 
   def drop(self,key):
     msg = ['valve','drop',key]

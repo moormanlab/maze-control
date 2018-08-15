@@ -49,7 +49,7 @@ class ledButton(object):
 
 
 class MazeButtons(object):
-  def __init__(self):
+  def __init__(self,handler=None):
     self.button = {}
     for key in buttons:
       self.button[key] = ledButton(gpioN=buttons[key][0],ledN=buttons[key][1],color=buttons[key][2])

@@ -54,10 +54,19 @@ class Maze(object):
     self.protocol.init()
     self.protocolP = Process(target=self.protocol.run)
 
-    self.hal = MazeHal(queueCommands=self.qC,queueResponses=self.qR)
-    self.halP = Process(target=self.hal._run)
+    if 'sensorHandler' in dir(self.protocol):
+      sensorHandler = self.protocol.sensorHandler
+    else:
+      sensorHandler = None
 
-    self.protocol.init()
+    if 'buttonHandler' in dir(self.protocol):
+      buttonHandler = self.protocol.buttonHandler
+    else:
+      buttonHandler = None
+
+    self.hal = MazeHal(queueCommands=self.qC,queueResponses=self.qR,
+            sensorHandler=sensorHandler,buttonHandler=buttonHandler)
+    self.halP = Process(target=self.hal._run)
 
   def start(self):
     if self.protocol == None:
