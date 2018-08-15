@@ -36,43 +36,37 @@ sensors = {'UL':18,
 
 class Sensor(object):
   def __init__(self,gpioN=0, whenP = None):
-    logger.info('Sensor connected to gpio %s with id %s',gpioN,id(self))
     self.sensor=gpiozero.Button(gpioN)
     self.sensor.when_pressed = whenP
-    logger.debug('gpiozero button gpio {a} id {b} and handler id {c}'.format(a=gpioN,b=id(self.sensor),c=id(whenP)))
 
   def isPressed(self):
     return self.sensor.is_pressed
 
 class MazeSensors(object):
-  def __init__(self):
-    # Initialise the PCA9685 using the default address (0x40).
+  def __init__(self,handler=None):
     self.sensor = {}
+    self.handler = handler
     for key in sensors:
       self.sensor[key] = Sensor(gpioN=sensors[key] , whenP = self._sensorsHandler)
-      logger.debug(' button {a} id {b}'.format(a=key, b=id(self.sensor[key])))
 
     logger.debug('MazeSensors id %s ',id(self))
     logger.info('Sensors version {a}'.format(a=SENSORVERSION))
 
   def _sensorsHandler(self):
-    if self.isPressed('C'):
-      logger.debug('H C')
-    if self.isPressed('L'):
-      logger.debug('H L')
-    if self.isPressed('R'):
-      logger.debug('H R')
-    if self.isPressed('UL'):
-      logger.debug('H UL')
-    if self.isPressed('UR'):
-      logger.debug('H UR')
-    if self.isPressed('BL'):
-      logger.debug('H BL')
-    if self.isPressed('BR'):
-      logger.debug('H BR')
+    try:
+      if self.handler is not None:
+        self.handler(self)
+      else:
+        for key in self.sensor:
+          if self.isPressed(key):
+            logger.debug('key pressed {a}'.format(a=key))
+    except Exception as e:
+      logger.debug(e)
+      print('error handled')
 
   def isPressed(self,key):
     return self.sensor[key].isPressed()
+
 
 if __name__ == '__main__':
   import sys,os
@@ -87,21 +81,16 @@ if __name__ == '__main__':
           format=formatter_str, datefmt=dateformat)
 
   logger.info('Sensors test')
-  sn = MazeSensors()
+
+  def anotherHandler(obj):
+    for key in obj.sensor:
+      if obj.isPressed(key):
+        print(key)
+    logger.info(obj.sensor)
+
+  logger.info(id(anotherHandler))
+  sn = MazeSensors(anotherHandler)
+  logger.info(id(sn))
 
   while True:
-      if sn.isPressed('C'):
-        print('C')
-      if sn.isPressed('L'):
-        print('L')
-      if sn.isPressed('R'):
-        print('R')
-      if sn.isPressed('UL'):
-        print('UL')
-      if sn.isPressed('UR'):
-        print('UR')
-      if sn.isPressed('BL'):
-        print('BL')
-      if sn.isPressed('BR'):
-        print('BR')
-      time.sleep(0.1)
+    time.sleep(2)
