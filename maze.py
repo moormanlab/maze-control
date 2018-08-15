@@ -111,7 +111,7 @@ if __name__ == '__main__':
   maze.start()
   try:
     while True:
-
+        time.sleep(1)
         pass
 
   except Exception as inst:

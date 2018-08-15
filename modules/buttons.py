@@ -8,8 +8,8 @@ import time
 import logging
 logger=logging.getLogger(__name__)
 
-import adai2c as pwm
-#import modules.adai2c as pwm
+import modules.adai2c as pwm
+#import adai2c as pwm
 import gpiozero
 #import modules.gpiozero as gpiozero
 
