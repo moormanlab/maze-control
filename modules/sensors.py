@@ -35,9 +35,11 @@ sensors = {'UL':18,
            }
 
 class Sensor(object):
-  def __init__(self,gpioN=0, whenP = None):
+  def __init__(self,gpioN=0):
     self.sensor=gpiozero.Button(gpioN)
-    self.sensor.when_pressed = whenP
+
+  def setWhenPressed(self,handler):
+    self.sensor.when_pressed = handler
 
   def isPressed(self):
     return self.sensor.is_pressed
@@ -47,7 +49,10 @@ class MazeSensors(object):
     self.sensor = {}
     self.handler = handler
     for key in sensors:
-      self.sensor[key] = Sensor(gpioN=sensors[key] , whenP = self._sensorsHandler)
+      self.sensor[key] = Sensor(gpioN=sensors[key])
+
+    for key in sensors:
+      self.sensor[key].setWhenPressed(self._sensorsHandler)
 
     logger.debug('MazeSensors id %s ',id(self))
     logger.info('Sensors version {a}'.format(a=SENSORVERSION))
