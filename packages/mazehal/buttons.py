@@ -36,13 +36,13 @@ class ledButton(object):
         value = 1.0
     elif value < 0.0:
         value = 0.0
-    self.pwm.set(self.ledN,int(value*4095))
+    self.pwm.set(self.ledN,int((1-value)*4095))
 
   def ledOn(self):
-    self.pwm.set(self.ledN,4095)
+    self.pwm.set(self.ledN,0)
 
   def ledOff(self):
-    self.pwm.set(self.ledN,0)
+    self.pwm.set(self.ledN,4095)
 
   def isPressed(self):
     return self.button.is_pressed
@@ -110,3 +110,30 @@ if __name__ == '__main__':
           msg = msg + str(i) + '=' + str(bt.isPressed(i)) + '|'
       logger.info(msg)
       time.sleep(2)
+      for i in range(20):
+        bt.setLedPwm('B',i/19)
+        time.sleep(.05)
+      for i in range(20):
+        bt.setLedPwm('B',1-i/19)
+        bt.setLedPwm('Y',i/19)
+        time.sleep(.05)
+      for i in range(20):
+        bt.setLedPwm('Y',1-i/19)
+        bt.setLedPwm('W',i/19)
+        time.sleep(.05)
+      for i in range(20):
+        bt.setLedPwm('W',1-i/19)
+        bt.setLedPwm('G',i/19)
+        time.sleep(.05)
+      for i in range(20):
+        bt.setLedPwm('G',1-i/19)
+        time.sleep(.05)
+      bt.setLedOn('B')
+      bt.setLedOn('Y')
+      bt.setLedOn('W')
+      bt.setLedOn('G')
+      time.sleep(.5)
+      bt.setLedOff('B')
+      bt.setLedOff('Y')
+      bt.setLedOff('W')
+      bt.setLedOff('G')
