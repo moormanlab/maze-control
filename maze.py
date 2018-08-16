@@ -46,7 +46,9 @@ class Maze(object):
     else:
         raise NameError("Class doesn't exist")
 
-    self.variable = 1
+    logger.info('Initializing Maze')
+    logger.debug('Maze id %s ',id(self))
+    logger.info('Maze version {a}'.format(a=MAZEVERSION))
     self.qC = Queue()
     self.qR = Queue()
 
@@ -70,14 +72,14 @@ class Maze(object):
 
   def start(self):
     if self.protocol == None:
-      logger.debug('no protocol')
+      logger.debug('No protocol assigned')
     else:
       self.halP.start()
       self.protocolP.start()
 
   def run(self):
     while True:
-      logger.info('logged')
+      logger.info('Logged')
       time.sleep(2)
     self.protocolP.join()
     self.halP.join()
@@ -101,7 +103,7 @@ if __name__ == '__main__':
     os.makedirs('./logs/')
   dateformat = '%Y/%m/%d %H:%M:%S'
   formatter_str = '%(asctime)s.%(msecs)d - %(name)s - %(levelname)s - %(message)s'
-  logfile = 'logs/mazer.log'
+  logfile = 'logs/maze.log'
 
   logging.basicConfig(filename=logfile,filemode='w+',level=logging.DEBUG,
          format=formatter_str, datefmt=dateformat)

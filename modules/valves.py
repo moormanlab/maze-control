@@ -43,7 +43,7 @@ class MazeValves(object):
       import Adafruit_GPIO.I2C as I2C
       i2c = I2C
     self._device = i2c.get_i2c_device(address, **kwargs)
-    self.valves = {}
+    self.valve = {}
     for key in valves:
       self.valve[key] = Valve(valves[key][0],valves[key][1])
     self.multidrop=2

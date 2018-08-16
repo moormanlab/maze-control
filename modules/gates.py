@@ -10,7 +10,7 @@ from ctypes import c_bool,c_int
 import logging
 logger=logging.getLogger(__name__)
 
-import modules.adai2c as pwm
+import adai2c as pwm
 #import adai2c as pwm
 
 # motor | open       | close       | key | position

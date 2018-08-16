@@ -85,7 +85,7 @@ if __name__ == '__main__':
   p = Process(target=hal._run)
   p.start()
   time.sleep(1)
-  hal.OpenValve()
+  qC.put(['gates','openall'])
   time.sleep(1)
   p.join()
 
