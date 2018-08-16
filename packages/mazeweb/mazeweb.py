@@ -1,0 +1,1 @@
+from mazeweb import app
