@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Arduino control for rat maze - V 0.2  2018/08/07
+// Arduino control for rat maze - V 0.3  2018/08/16
 ///////////////////////////////////////////////////////////////////////////////
 #define VERSIONMAY    0
-#define VERSIONMIN    2
+#define VERSIONMIN    3
 
 #include <Wire.h>  // Library which contains functions to have I2C Communication
 #define SLAVE_ADDRESS 0x60 // Define the I2C address to Communicate to Uno
@@ -59,7 +59,7 @@ enum COMMANDS {
 #define WAIT_FOR_DEBUNCE        50
 #define WAIT_FOR_PRESSDELAY   3000
 #define WAIT_FOR_HALT_ACK     5500
-#define WAIT_FOR_HALT        20000
+#define WAIT_FOR_HALT        15000
 
 
 #define LED_FAST_BLINK_TOP   10000
@@ -127,7 +127,7 @@ void loop() {
     else if (incomingByte == 'U')
       buttonSerial = false;
     // say what you got:
-    Serial.print("R: ");
+    Serial.print("R:");
     Serial.println(incomingByte, DEC);
   }
   if (isButtonPressed()) attendSystem=true;
@@ -301,12 +301,12 @@ Serial.println(raspiState,DEC); //TODO DEBUG
           else if (bufferRX[1]=='L') valveClose(valveLeft);
           break;
         case VALVE_DROP:             // second byte has valve number
-          if (bufferRX[1]=='R') valveMultiDrop(valveRight);
-          else if (bufferRX[1]=='L') valveMultiDrop(valveLeft);
-          break;
-        case VALVE_MULTIDROP:        // second byte has valve number
           if (bufferRX[1]=='R') valveDrop(valveRight);
           else if (bufferRX[1]=='L') valveDrop(valveLeft);
+          break;
+        case VALVE_MULTIDROP:        // second byte has valve number
+          if (bufferRX[1]=='R') valveMultiDrop(valveRight);
+          else if (bufferRX[1]=='L') valveMultiDrop(valveLeft);
           break;
         case VALVE_SET_MULTINUM:   // multidrop should be between 2 and 9
           if ((bufferRX[1]>1) and (bufferRX[1]<10)) 
@@ -465,15 +465,10 @@ void raspiReceiveData(int numBytes) {
 }
 
 bool isButtonPressed() {
-  return buttonSerial;
-}
-
-/*
-bool isButtonPressed() {
-  if (digitalRead(powerButton) == LOW) return true;
+  //if (digitalRead(powerButton) == LOW) return true;
+  if ((digitalRead(powerButton) == LOW) or (buttonSerial==true)) return true; //TODO DEBUG
   else return false;
 }
-*/
 
 void SignalHaltRPI() {
   response = 'H';
