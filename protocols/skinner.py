@@ -1,7 +1,7 @@
 # Example protocol for maze training
 # Author: Ariel Burman
 
-from protocols.mazeprotocols import MazeProtocols
+from mazeprotocols import MazeProtocols
 import time
 
 import logging

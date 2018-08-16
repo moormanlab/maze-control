@@ -10,8 +10,8 @@ import importlib
 from importlib import util as imputil
 from multiprocessing import Process, Queue
 
-from modules.mazehal import MazeHal
-from protocols.mazeprotocols import MazeProtocols
+from mazehal import MazeHal
+from mazeprotocols import MazeProtocols
 
 logger = logging.getLogger(__name__)
 
@@ -122,7 +122,3 @@ if __name__ == '__main__':
     self.proccess.exit()
     sys.exit()
     maze.exit()
-
-    
-
-
