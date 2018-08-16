@@ -95,15 +95,15 @@ class Gate(object):
           diff = 1
       else:
           diff = -1
-      #steps = 50
-      #diff = int((goal-now)/steps)
-      while (goal != now):
+      steps = 20
+      diff = ((goal-now)/steps)
+      for i in range(steps):
         now += diff
-        logger.debug('gate %s now %s',self.name,now)
+        logger.debug('gate %s now %s',self.name,int(now))
         if now < 10 or now > 600:
           raise NameError('pwm value exceeded maximum safe value')
-        self.motor.setPosition(now)
-        time.sleep(0.0001)
+        self.motor.setPosition(int(now))
+        time.sleep(1.5/steps)
         #self.motors[key].setPosition(now)
       self.motor.setPosition(goal)
       time.sleep(0.05)
