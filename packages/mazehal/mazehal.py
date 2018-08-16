@@ -37,7 +37,7 @@ class MazeHal():
             #leer de la cola
             if self.qC.empty() is False:
                 msg = self.qC.get()
-                print (msg)
+                logger.debug(msg)
                 if msg[0] == 'gate':
                     if msg[1] == 'openAllNow':
                         self.gates.openAllFast()
@@ -76,7 +76,7 @@ class MazeHal():
                   break
             #else:
             #    print('cola vacia')
-            time.sleep(.1)
+            time.sleep(.05)
 
             # si es una accion, enviar el comando a la clase correspondiente, que deberian ser procesos independientes
             # pero el sistema seguira funcionando

@@ -103,7 +103,17 @@ if __name__ == '__main__':
     os.makedirs('./logs/')
   dateformat = '%Y/%m/%d %H:%M:%S'
   formatter_str = '%(asctime)s.%(msecs)d - %(name)s - %(levelname)s - %(message)s'
-  logfile = 'logs/maze.log'
+  subjectname = 'Reed' # 'Reed' 'Sue' 'Jhonny' 'Ben'
+  import datetime
+  today = datetime.date.today().strftime("%Y-%m-%d")
+  Snum = 0
+  while True:
+    Snum += 1
+    logfile = 'logs/' + subjectname + '-' + today + '-S' + format(Snum, '02d') + '.log'
+    if os.path.isfile(logfile) == False:
+        break
+    if Snum == 99:
+        raise NameError('Too many sessions in one day')
 
   logging.basicConfig(filename=logfile,filemode='w+',level=logging.DEBUG,
          format=formatter_str, datefmt=dateformat)

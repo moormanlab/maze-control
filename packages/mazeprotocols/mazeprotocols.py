@@ -27,12 +27,12 @@ class MazeProtocols(object):
   def isSensorActive(self,key):
     self.qC.put(['sensor',key])
     while self.qR.empty():
-      time.sleep(.1)
+      time.sleep(.01)
     a = self.qR.get()
     if a[0]=='sensor':
       return a[1]
     else:
-      raise NameError('error insesperado')
+      raise NameError('Unespected error')
 
   def drop(self,key):
     msg = ['valve','drop',key]

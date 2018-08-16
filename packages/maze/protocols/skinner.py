@@ -9,7 +9,8 @@ logger=logging.getLogger(__name__)
 
 class Skinner (MazeProtocols):
   def init(self):
-    # initiazlization
+    # initialization
+    # put here the code you want to run only once, at first
     self.time = 0
     self.state = 'start'
     self.openGate('IUL')
@@ -23,15 +24,22 @@ class Skinner (MazeProtocols):
     time.sleep(2)
 
   def myFunction(self,param):
-    print(param)
+    logger.debug(param)
 
 #  def buttonHandler(obj):
-#      print('if you dont use a handler this function should be commented')
-
+#      ''' If you dont use a handler this function should be commented'''
+#      pass
+#
 #  def sensorHandler(obj):
-#      print('if you dont use a handler this function should be commented')
+#      ''' If you dont use a handler this function should be commented'''
+#      pass
 
   def run(self):
+    ''' 
+    This is the main loop. It should have a 'while True:' statement
+    also it is recomended to have a time.slep(.05) or bigger delay
+    
+    '''
     try:
       while True:
         self.myFunction(self.state)
@@ -104,11 +112,11 @@ class Skinner (MazeProtocols):
             self.openGate('OUR')
             self.state = 'start'
 
-        time.sleep(.2)
+        time.sleep(.05)
 
     except Exception as e:
       print(e)
     finally:
-      print('bye')
+      print('Program terminated')
 
 
