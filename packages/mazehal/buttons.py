@@ -8,11 +8,8 @@ import time
 import logging
 logger=logging.getLogger(__name__)
 
-#import modules.adai2c as pwm
 import adai2c as pwm
 import gpiozero
-#import modules.gpiozero as gpiozero
-
 
 buttons = {'B':[12,15,'blue'],
            'W':[13,12,'white'],
@@ -30,6 +27,9 @@ class ledButton(object):
     self.pwm = pwm.AdaI2C()
     self.color = color
     logger.debug(" gpiozero button %s id %d", self.color, id(self.button))
+
+  def setWhenPressed(self,handler):
+    self.button.when_pressed = handler
 
   def ledPwm(self,value):
     if value > 1.0:
@@ -51,10 +51,28 @@ class ledButton(object):
 class MazeButtons(object):
   def __init__(self,handler=None):
     self.button = {}
+    self.handler = handler
     for key in buttons:
       self.button[key] = ledButton(gpioN=buttons[key][0],ledN=buttons[key][1],color=buttons[key][2])
+
+    for key in self.button:
+      self.button[key].setWhenPressed(self._buttonsHandler)
+
     logger.debug('MazeButtons id %s ',id(self))
     logger.info('Buttons version {a}'.format(a=BUTTONSVERSION))
+
+  def _buttonsHandler(self):
+    try:
+      if self.handler is not None:
+        self.handler(self)
+      else:
+        for key in self.button:
+          if self.isPressed(key):
+            logger.debug('key pressed {a}'.format(a=key))
+    except Exception as e:
+      logger.debug(e)
+      print('error handled')
+
 
   def setLedOn(self,key):
     logger.info('New Led %s on',self.button[key].color)

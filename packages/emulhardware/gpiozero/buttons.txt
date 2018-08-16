@@ -1,0 +1,11 @@
+12,F,blue
+13,F,white
+5,F,yellow
+6,F,green
+18,F,UL
+23,F,UR
+4,F,BL
+24,F,BR
+17,F,L
+27,F,C
+22,F,R

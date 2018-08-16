@@ -11,7 +11,6 @@ import logging
 logger=logging.getLogger(__name__)
 
 import adai2c as pwm
-#import adai2c as pwm
 
 # motor | open       | close       | key | position
 # 0     | 220 -> 222 | 540 -> 534  | IUL | inner upper left 

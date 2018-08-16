@@ -9,11 +9,11 @@ from multiprocessing import Process, Queue
 import logging
 logger=logging.getLogger(__name__)
 
-from modules.valves import MazeValves
-from modules.gates import MazeGates
-from modules.buttons import MazeButtons
-from modules.sensors import MazeSensors
-#from modules.sounds import MazeSounds
+from .valves import MazeValves
+from .gates import MazeGates
+from .buttons import MazeButtons
+from .sensors import MazeSensors
+from .sounds import MazeSounds
 
 class MazeHal():
 

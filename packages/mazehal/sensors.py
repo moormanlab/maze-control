@@ -51,7 +51,7 @@ class MazeSensors(object):
     for key in sensors:
       self.sensor[key] = Sensor(gpioN=sensors[key])
 
-    for key in sensors:
+    for key in self.sensor:
       self.sensor[key].setWhenPressed(self._sensorsHandler)
 
     logger.debug('MazeSensors id %s ',id(self))

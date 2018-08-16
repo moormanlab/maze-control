@@ -35,9 +35,7 @@ class Valve():
     self.data = data
 
 class MazeValves(object):
-  """PCA9685 PWM LED/servo controller."""
   def __init__(self, address=ARDUINO_ADDRESS, i2c=None, **kwargs):
-    """Initialize the PCA9685."""
     # Setup I2C interface for the device.
     if i2c is None:
       import Adafruit_GPIO.I2C as I2C

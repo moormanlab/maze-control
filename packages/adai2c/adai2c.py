@@ -11,7 +11,6 @@ logger=logging.getLogger(__name__)
 
 # Import the PCA9685 module.
 import Adafruit_PCA9685
-#import modules.Adafruit_PCA9685 as Adafruit_PCA9685
 
 class AdaI2C(object):
   class __impl:
