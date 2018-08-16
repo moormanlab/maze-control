@@ -44,9 +44,13 @@ class MazeHal():
                     elif msg[1] == 'openAll':
                         self.gates.openAll()
                     elif msg[1] == 'open':
-                        self.gates.openGateFast(msg[2])
+                        self.gates.openGate(msg[2])
                     elif msg[1] == 'close':
-                        self.gates.closeGateFast(msg[2])
+                        self.gates.closeGate(msg[2])
+                    elif msg[1] == 'openF':
+                        self.gates.openGate(msg[2])
+                    elif msg[1] == 'closeF':
+                        self.gates.closeGate(msg[2])
                 if msg[0] == 'sensor':
                     resp = self.sensors.isPressed(msg[1])
                     self.qR.put(['sensor',resp])

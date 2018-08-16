@@ -103,7 +103,7 @@ class Gate(object):
         if now < 10 or now > 600:
           raise NameError('pwm value exceeded maximum safe value')
         self.motor.setPosition(int(now))
-        time.sleep(1.5/steps)
+        time.sleep(.8/steps)
         #self.motors[key].setPosition(now)
       self.motor.setPosition(goal)
       time.sleep(0.05)
