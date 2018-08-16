@@ -21,7 +21,7 @@ class MazeHal():
         self.qC = queueCommands
         self.qR = queueResponses
 #        self.p = []
-#        self.valves = MazeValves()
+        self.valves = MazeValves()
         self.buttons = MazeButtons(buttonHandler)
         self.sensors = MazeSensors(sensorHandler)
         self.subject = None
@@ -51,9 +51,27 @@ class MazeHal():
                         self.gates.openGate(msg[2])
                     elif msg[1] == 'closeF':
                         self.gates.closeGate(msg[2])
-                if msg[0] == 'sensor':
+                elif msg[0] == 'sensor':
                     resp = self.sensors.isPressed(msg[1])
                     self.qR.put(['sensor',resp])
+                elif msg[0] == 'valve':
+                    if msg[1] == 'drop':
+                        self.valves.drop(msg[2])
+                    elif msg[1]=='open':
+                        self.valves.open(msg[2])
+                    elif msg[1]=='close':
+                        self.valves.close(msg[2])
+                    elif msg[1]=='sdd':
+                        self.valves.setDropDelay(msg[2])
+                    elif msg[1]=='smd':
+                        self.valves.setMultidropsNum(msg[2])
+                    elif msg[1]=='smdd':
+                        self.valves.setMultidropsDelay(msg[2])
+                elif msg[0] == 'sound':
+                    if msg[1] == 'play':
+                        self.valves.drop(msg[2])
+                    elif msg[1]=='set':
+                        self.valves.open(msg[2])
                 if msg[0] == 'exit':
                   break
             #else:

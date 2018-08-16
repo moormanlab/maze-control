@@ -13,21 +13,14 @@ class Skinner (MazeProtocols):
     self.time = 0
     self.state = 'start'
     self.openGate('IUL')
-    time.sleep(1)
     self.openGate('IUR')
-    time.sleep(1)
     self.openGate('OUL')
-    time.sleep(1)
     self.openGate('OUR')
-    time.sleep(1)
     self.openGate('OBL') # maybe closed
-    time.sleep(1)
     self.openGate('OBR') # maybe closed
-    time.sleep(1)
     self.closeGate('IBL')
-    time.sleep(1)
     self.closeGate('IBR')
-    time.sleep(1)
+    time.sleep(2)
 
   def myFunction(self,param):
     print(param)
@@ -52,7 +45,7 @@ class Skinner (MazeProtocols):
             #the rat went left
             self.state='going left'
             # check for reward
-            #self.drop('L')
+            self.drop('L')
           #elif self.lastSensorActive()=='UR':
           elif self.isSensorActive('UR')==True:
             #the rat went left
@@ -62,9 +55,7 @@ class Skinner (MazeProtocols):
             self.openGate('OBR')
             self.state='going right'
             # check for reward
-            self.drop('L')
-            # check for reward
-            #self.drop('L')
+            self.drop('R')
 
         elif self.state == 'going left':
           #if self.lastSensorActive()=='L':
