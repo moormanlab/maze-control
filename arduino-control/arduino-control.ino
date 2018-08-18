@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Arduino control for rat maze - V 0.3  2018/08/16
+// Arduino control for rat maze - V 1.1  2018/08/18
 ///////////////////////////////////////////////////////////////////////////////
-#define VERSIONMAY    0
-#define VERSIONMIN    3
+#define VERSIONMAY    1
+#define VERSIONMIN    0
 
 #include <Wire.h>  // Library which contains functions to have I2C Communication
 #define SLAVE_ADDRESS 0x60 // Define the I2C address to Communicate to Uno
@@ -55,7 +55,7 @@ enum COMMANDS {
 #define DELAYMULTIDROP  500
 
 
-#define WAIT_FOR_RPI_BOOT    15000
+#define WAIT_FOR_RPI_BOOT    20000
 #define WAIT_FOR_DEBUNCE        50
 #define WAIT_FOR_PRESSDELAY   3000
 #define WAIT_FOR_HALT_ACK     5500
@@ -173,17 +173,13 @@ Serial.println(raspiState,DEC); //TODO DEBUG
             raspiState = SYS_OFF;
 Serial.print("S:"); //TODO DEBUG
 Serial.println(raspiState,DEC); //TODO DEBUG
-            ledFunction(LED_SLOW_FADE);
+            ledFunction(LED_ON);
             attendSystem = false;
         }
         break;
       case SYS_BOOTING:
         timeNow=millis();
         if ((timeNow-timeLap) > WAIT_FOR_RPI_BOOT){
-//Serial.print("timeLap: "); //TODO DEBUG
-//Serial.print(timeLap);
-//Serial.print(" | timeNow: ");
-//Serial.println(timeNow);
           // before 20 seconds arduino should receive a package from 
           // raspi saying it already boot.
           // If that did not happend, the system will indicate error
@@ -237,7 +233,7 @@ Serial.println(raspiState,DEC); //TODO DEBUG
           raspiState = SYS_RUNNING;
 Serial.print("S:"); //TODO DEBUG
 Serial.println(raspiState,DEC); //TODO DEBUG
-          ledFunction(LED_ON);
+          ledFunction(LED_SLOW_FADE);
           attendSystem = false;
         }
         break;
@@ -265,7 +261,8 @@ Serial.println("error 3");
           attendSystem = false;
 Serial.print("S:"); //TODO DEBUG
 Serial.println(raspiState,DEC); //TODO DEBUG
-          ledFunction(LED_SLOW_FADE);
+          ledFunction(LED_ON);
+          response = 'C'; 
           digitalWrite(raspiRun,LOW);
         }
         break;
@@ -361,7 +358,7 @@ Serial.println("error 1"); //TODO DEBUG
       if (bufferRX[0] = RPI_KEEPALIVE){
         raspiState=SYS_RUNNING;
         attendSystem = false;
-        ledFunction(LED_ON);
+        ledFunction(LED_SLOW_FADE);
       }
       else {
         // should not happed
@@ -400,7 +397,7 @@ void setup() {
   Serial.println(VERSIONMIN);
 
   raspiState = SYS_OFF;
-  ledFunction(LED_SLOW_FADE);
+  ledFunction(LED_ON);
   attendSystem = false;
 
   response = 0;
@@ -531,7 +528,7 @@ void ledFunction(uint8_t newLedState){
         if (ledCounter > LED_SLOW_FADE_TOP) {
           if (upward == true) {
             duty++;
-            if (duty == 255){
+            if (duty == 90){
               upward = false;
             }
           }
@@ -550,7 +547,7 @@ void ledFunction(uint8_t newLedState){
         if (ledCounter > LED_FAST_FADE_TOP) {
           if (upward == true) {
             duty++;
-            if (duty == 255){
+            if (duty == 127){
               upward = false;
             }
           }
