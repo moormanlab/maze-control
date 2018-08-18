@@ -5,6 +5,7 @@ from signal import pause
 logger=logging.getLogger(__name__)
 
 def giveWarning(labl):
+  print(labl.pin)
   print ("rat is at sensor: ",labl)
 
 
@@ -18,8 +19,8 @@ sensors={'A': gpiozero.Button(4), #southeast    yellow
 
 
 for sensK,sensV in sensors.items():
-    sensors[sensK].when_pressed = lambda: giveWarning(sensK)
-    print(sensK)
+    #sensors[sensK].when_pressed = lambda: giveWarning(sensK)
+    sensors[sensK].when_pressed = giveWarning
 
 #sensors['A'].when_pressed = lambda: giveWarning('A')
 #sensors['B'].when_pressed = lambda: giveWarning('B')
