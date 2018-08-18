@@ -47,19 +47,28 @@ class MazeValves(object):
     logger.info('Valves version {a}'.format(a=VALVEVERSION))
 
   def open(self,key):
+    logger.debug('Open valve {a}'.format(a=key))
     self._device.write8(VALVE_OPEN,self.valve[key].data)
 
   def close(self,key):
+    logger.debug('Close valve {a}'.format(a=key))
     self._device.write8(VALVE_CLOSE,self.valve[key].data)
 
   def drop(self,key):
+    logger.debug('Drop valve {a}'.format(a=key))
     self._device.write8(VALVE_DROP,self.valve[key].data)
 
+  def multiDrop(self,key):
+    logger.debug('Multi drop valve {a}'.format(a=key))
+    self._device.write8(VALVE_MULTIDROP,self.valve[key].data)
+
   def setDropDelay(self,num):
+    logger.debug('Set drop delay {a}'.format(a=num))
     self.dropdelay = num
     self._device.write8(VALVE_SET_DELAYMULTIDROP,num)
 
   def setMultidropsNum(self,num):
+    logger.debug('Set multidrop num {a}'.format(a=num))
     self.multidrop = num
     self._device.write8(VALVE_SET_MULTINUM,num)
 
