@@ -1,4 +1,5 @@
 from mazehal.valves import MazeValves
+from mazehal.gates import MazeGates
 
 
 import termios, fcntl, sys, os
@@ -9,6 +10,7 @@ newattr[3] = newattr[3] & ~termios.ICANON & ~termios.ECHO
 termios.tcsetattr(fd, termios.TCSANOW, newattr)
 oldflags = fcntl.fcntl(fd, fcntl.F_GETFL)
 fcntl.fcntl(fd, fcntl.F_SETFL, oldflags | os.O_NONBLOCK)
+
 
 def printhelp():
     print ('------------------------------')
@@ -25,9 +27,15 @@ def printhelp():
     print ('q : exit')
     print ('------------------------------')
 
-a = MazeValves()
-printhelp()
 try:
+    a = MazeValves()
+    from multiprocessing import Process
+    gates = MazeGates()
+    p = Process(target=gates.run)
+    p.start()
+    printhelp()
+    gates.openAllFast()
+    gates.releaseAll()
     while True:
         try:
             c = sys.stdin.read(1)
@@ -84,5 +92,5 @@ try:
 finally:
     termios.tcsetattr(fd, termios.TCSAFLUSH, oldterm)
     fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
-
-
+    gates.exit()
+    p.join()

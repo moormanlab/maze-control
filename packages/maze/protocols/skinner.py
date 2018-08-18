@@ -1,16 +1,22 @@
 # Example protocol for maze training
 # Author: Ariel Burman
 
+
 from mazeprotocols import MazeProtocols
 import time
 
 import logging
 logger=logging.getLogger(__name__)
 
+
+PROTOCOL_NAME= 'Skinner'
+PROTOCOL_VERSION = '1.0'
+
 class Skinner (MazeProtocols):
   def init(self):
     # initialization
     # put here the code you want to run only once, at first
+    logger.info('Protocol: {a}, Version: {b}'.format(a=PROTOCOL_NAME,b=PROTOCOL_VERSION))
     self.time = 0
     self.state = 'start'
     self.openGate('IUL')
@@ -22,7 +28,7 @@ class Skinner (MazeProtocols):
     self.closeGate('IBL')
     self.closeGate('IBR')
     self.multidone = False
-    self.setMultiDrops(5)
+    self.setMultiDrop(5)
     logger.info('set multidrop to 5')
     time.sleep(2)
 
@@ -88,7 +94,7 @@ class Skinner (MazeProtocols):
 
           if self.isSensorActive('L')==True:
             if self.multidone == False:
-              self.multidrop('L')
+              self.multiDrop('L')
               self.multidone = True
 
         elif self.state == 'returning left':
@@ -117,7 +123,7 @@ class Skinner (MazeProtocols):
 
           if self.isSensorActive('R')==True:
             if self.multidone == False:
-              self.multidrop('R')
+              self.multiDrop('R')
               self.multidone = True
                 
         elif self.state == 'returning right':
