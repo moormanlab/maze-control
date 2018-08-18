@@ -39,6 +39,16 @@ class MazeProtocols(object):
     self.qC.put(msg)
     logger.debug(msg)
 
+  def multiDrop(self,key):
+    msg = ['valve','multidrop',key]
+    self.qC.put(msg)
+    logger.debug(msg)
+
+  def setMultiDrop(self,num):
+    msg = ['valve','smd',num]
+    self.qC.put(msg)
+    logger.debug(msg)
+
   def openGate(self,key):
     msg = ['gate','open',key]
     self.qC.put(msg)

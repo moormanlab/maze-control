@@ -57,6 +57,8 @@ class MazeHal():
                 elif msg[0] == 'valve':
                     if msg[1] == 'drop':
                         self.valves.drop(msg[2])
+                    elif msg[1] == 'multidrop':
+                        self.valves.drop(msg[2])
                     elif msg[1]=='open':
                         self.valves.open(msg[2])
                     elif msg[1]=='close':

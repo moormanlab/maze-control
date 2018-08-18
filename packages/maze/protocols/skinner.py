@@ -21,6 +21,9 @@ class Skinner (MazeProtocols):
     self.openGate('OBR') # maybe closed
     self.closeGate('IBL')
     self.closeGate('IBR')
+    self.multidone = False
+    self.setMultiDrops(5)
+    logger.info('set multidrop to 5')
     time.sleep(2)
 
   def myFunction(self,param):
@@ -45,6 +48,7 @@ class Skinner (MazeProtocols):
         self.myFunction(self.state)
         if self.state == 'start':
           #if self.lastSensorActive()=='UL':
+          self.multidone = False
           if self.isSensorActive('UL')==True:
             self.closeGate('IBL')
             self.closeGate('IBR')
@@ -54,6 +58,7 @@ class Skinner (MazeProtocols):
             self.state='going left'
             # check for reward
             self.drop('L')
+            logger.info('reward on left')
           #elif self.lastSensorActive()=='UR':
           elif self.isSensorActive('UR')==True:
             #the rat went left
@@ -64,6 +69,7 @@ class Skinner (MazeProtocols):
             self.state='going right'
             # check for reward
             self.drop('R')
+            logger.info('reward on right')
 
         elif self.state == 'going left':
           #if self.lastSensorActive()=='L':
@@ -79,6 +85,11 @@ class Skinner (MazeProtocols):
             self.openGate('IUL')
             self.openGate('IUR')
             self.state = 'returning left'
+
+          if self.isSensorActive('L')==True:
+            if self.multidone == False:
+              self.multidrop('L')
+              self.multidone = True
 
         elif self.state == 'returning left':
           #if self.lastSensorActive()=='C':
@@ -103,6 +114,11 @@ class Skinner (MazeProtocols):
             self.openGate('IUL')
             self.openGate('IUR')
             self.state = 'returning right'
+
+          if self.isSensorActive('R')==True:
+            if self.multidone == False:
+              self.multidrop('R')
+              self.multidone = True
                 
         elif self.state == 'returning right':
           #if self.lastSensorActive()=='C':
@@ -112,7 +128,7 @@ class Skinner (MazeProtocols):
             self.openGate('OUR')
             self.state = 'start'
 
-        time.sleep(.05)
+        time.sleep(.025)
 
     except Exception as e:
       print(e)
