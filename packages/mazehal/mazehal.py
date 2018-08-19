@@ -24,6 +24,7 @@ class MazeHal():
         self.valves = MazeValves()
         self.buttons = MazeButtons(buttonHandler)
         self.sensors = MazeSensors(sensorHandler)
+        self.sounds = MazeSounds()
         self.subject = None
         self.gates = MazeGates()
         self.gatesP=Process(target=self.gates.run)
@@ -71,17 +72,16 @@ class MazeHal():
                         self.valves.setMultidropsDelay(msg[2])
                 elif msg[0] == 'sound':
                     if msg[1] == 'play':
-                        self.valves.drop(msg[2])
-                    elif msg[1]=='set':
-                        self.valves.open(msg[2])
-                if msg[0] == 'exit':
-                  break
-            #else:
-            #    print('cola vacia')
-            time.sleep(.05)
+                        self.sounds.play(msg[2])
+                    elif msg[1]=='add':
+                        self.sounds.addTone(key=msg[2][0],duration=msg[2][1],freq=msg[2][2],volume=msg[2][3])
+                elif msg[0] == 'exit':
 
-            # si es una accion, enviar el comando a la clase correspondiente, que deberian ser procesos independientes
-            # pero el sistema seguira funcionando
+                  break
+                else:
+                  raise NameError('Messege not defined')
+                  logger.error('Messegge {a} not defined'.format(a=msg[0]))
+            time.sleep(.05)
 
       finally:
           pass

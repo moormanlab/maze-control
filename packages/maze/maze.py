@@ -30,6 +30,21 @@ def check_module(module_name):
         logger.info('Module: {} can be imported!'.format(module_name))
         return module_spec
 
+def printhelp():
+    print ('------------------------------')
+    print ('e : open left')
+    print ('d : close left')
+    print ('c : drop left')
+    print ('t : open right')
+    print ('g : close right')
+    print ('b : drop right')
+    print ('u : set drops')
+    print ('j : set delay drop')
+    print ('m : set delay multi drop')
+    print ('? o h : help')
+    print ('q : exit')
+    print ('------------------------------')
+
 
 class Maze(object):
 
@@ -78,11 +93,89 @@ class Maze(object):
       self.protocolP.start()
 
   def run(self):
-    while True:
-      logger.info('Logged')
-      time.sleep(2)
-    self.protocolP.join()
-    self.halP.join()
+    import termios, fcntl, sys, os
+    fd = sys.stdin.fileno()
+    oldterm = termios.tcgetattr(fd)
+    newattr = termios.tcgetattr(fd)
+    newattr[3] = newattr[3] & ~termios.ICANON & ~termios.ECHO
+    termios.tcsetattr(fd, termios.TCSANOW, newattr)
+    oldflags = fcntl.fcntl(fd, fcntl.F_GETFL)
+    fcntl.fcntl(fd, fcntl.F_SETFL, oldflags | os.O_NONBLOCK)
+    printhelp()
+    try:
+
+      while True:
+        print('looping')
+        time.sleep(1)
+        c = sys.stdin.read(1)
+        if c == 'e':
+          self.qC.open('L')
+          print('open left')
+        elif c == 'd':
+          a.close('L')
+          print('close left')
+        elif c == 'c':
+          a.drop('L')
+          print('drop left')
+        elif c == 't':
+          a.open('R')
+          print('open right')
+        elif c == 'g':
+          a.close('R')
+          print('close right')
+        elif c == 'b':
+          msg = ['valve','drop','R']
+          self.qC.put(msg)
+          print('drop right')
+        elif c == 'u':
+          print ('set how many drops : ')
+          c = sys.stdin.read(1)
+          while c == '':
+            c = sys.stdin.read(1)
+            print ('will set {a} drops'.format(a=c))
+        elif c == 'j':
+          print ('set delay drop : ')
+          c = sys.stdin.read(1)
+          while c == '':
+            c = sys.stdin.read(1)
+            n = 0
+            while c != 'e':
+              n *= 10
+              n += int(c)
+              c = sys.stdin.read(1)
+              while c == '':
+                c = sys.stdin.read(1)
+                print ('will set drop delay {a}'.format(a=n))
+        elif c == 'm':
+          print ('set delay multi drop : ')
+          c = sys.stdin.read(1)
+          while c == '':
+            c = sys.stdin.read(1)
+          print ('will set multidrop delay {a}'.format(a=c))
+        elif c == '?' or c == 'h':
+            printhelp()
+        elif c == 'q':
+            print ('exiting')
+            break
+    except IOError:
+      print ('error capturing HEERERERERE')
+      logger.error('error capturing HEERERERERE')
+    except Exception as e:
+        print ('#################################')
+        print (e)
+        print ('#################################')
+        logger.error('#################################')
+        logger.error(e)
+        logger.error('#################################')
+        termios.tcsetattr(fd, termios.TCSAFLUSH, oldterm)
+        fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
+    finally:
+        print ('#####FINALYY#######')
+        termios.tcsetattr(fd, termios.TCSAFLUSH, oldterm)
+        fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
+        self.exit()
+#        self.protocolP.join()
+#        self.halP.join()
 
   def forceOpenAllGates(self):
     msg = ['gate','openAllNow']
@@ -92,10 +185,13 @@ class Maze(object):
     pass
 
   def pause(self):
-    logger.warning('exiting')
+    logger.warning('pausing')
 
   def exit(self):
     logger.warning('exiting')
+    self.halP.terminate()
+    self.protocolP.terminate()
+    sys.exit()
       
 if __name__ == '__main__':
   import sys,os
@@ -119,16 +215,19 @@ if __name__ == '__main__':
          format=formatter_str, datefmt=dateformat)
 
   logger.info('maze test')
-  maze = Maze('skinner','Skinner')
+  #maze = Maze('skinner','Skinner')
+  maze = Maze('classic','Classic')
   maze.start()
+  
   try:
-    while True:
-        time.sleep(1)
-        pass
+    maze.run()
+    print('im here')
 
   except Exception as inst:
+    print ('im heeeeeereeeeeeEEEEEEEEEEEEEEEEEEEEEE')
+    print(inst)
+
     logger.warning(type(inst))
     logger.warning(inst.args)
-    self.proccess.exit()
-    sys.exit()
     maze.exit()
+    sys.exit()
