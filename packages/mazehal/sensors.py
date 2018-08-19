@@ -1,7 +1,7 @@
 # Sensors control for maze
 # Author: Ariel Burman
 
-SENSORVERSION = 1.0
+SENSORVERSION = 1.1
 
 import time
 
@@ -57,11 +57,15 @@ class MazeSensors(object):
     logger.debug('MazeSensors id %s ',id(self))
     logger.info('Sensors version {a}'.format(a=SENSORVERSION))
 
-  def _sensorsHandler(self):
+  def _sensorsHandler(self,sensorid):
     try:
+      # recover gpio
+      print(sensorid)
+      sensorname = 'U'
       if self.handler is not None:
-        self.handler(self)
+        self.handler(self,sensorname)
       else:
+        logger.debug('key pressed {a}'.format(a=sensorname))
         for key in self.sensor:
           if self.isPressed(key):
             logger.debug('key pressed {a}'.format(a=key))

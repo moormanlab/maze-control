@@ -13,6 +13,7 @@ class Button(object):
     def __init__(self, pin=None, pull_up=True, bounce_time=None,hold_time=1, 
             hold_repeat=False):
         self.pin =pin
+        self.pinname = 'GPIO'+str(pin)
         self.hold_time = hold_time
         self.hold_repeat = hold_repeat
         self.when_pressed= None
@@ -31,7 +32,6 @@ class Button(object):
 
     @when_pressed.setter
     def when_pressed(self,handler):
-      logger.warning(dir(self))
       self.__when_pressed = handler
       if handler is not None:
         self.p.start()
@@ -44,7 +44,7 @@ class Button(object):
             self._is_pressed.value = self.t.buttonPress(self.pin)
             if self.when_pressed is not None:
               logger.debug('calling handler {a} with id {b} name {c}'.format(a=self.when_pressed,b=id(self.when_pressed),c=str(self.when_pressed)))
-              self.when_pressed()
+              self.when_pressed(self.pinname)
 
         time.sleep(.05)
 

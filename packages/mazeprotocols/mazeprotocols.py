@@ -1,7 +1,7 @@
 # Protocol base class for maze training
 # Author: Ariel Burman
 
-PROTOCOLSVERSION = 1.0
+PROTOCOLSVERSION = 1.1
 
 import time
 
