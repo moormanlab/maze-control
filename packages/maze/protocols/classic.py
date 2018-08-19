@@ -84,6 +84,7 @@ class Classic (MazeProtocols):
             self.state='going left'
             # check for reward
             self.drop('L')
+            self.toneDone = False
             logger.info('reward on left')
           #elif self.lastSensorActive()=='UR':
           elif self.isSensorActive('UR')==True:
@@ -93,6 +94,7 @@ class Classic (MazeProtocols):
             self.closeGate('IUL')
             self.openGate('OBR')
             self.state='going right'
+            self.toneDone = False
             # check for reward
             self.drop('R')
             logger.info('reward on right')
@@ -124,7 +126,10 @@ class Classic (MazeProtocols):
             self.openGate('OUL')
             self.openGate('OUR')
             self.state = 'start'
-            self.toneDone = False
+            self.chooseNextTone()
+            self.playSound(self.nextTone)
+            logger.info('Played tone {a}'.format(a=self.nextTone))
+            self.toneDone = True
 
 
         elif self.state == 'going right':
@@ -154,7 +159,10 @@ class Classic (MazeProtocols):
             self.openGate('OUL')
             self.openGate('OUR')
             self.state = 'start'
-            self.toneDone = False
+            self.chooseNextTone()
+            self.playSound(self.nextTone)
+            logger.info('Played tone {a}'.format(a=self.nextTone))
+            self.toneDone = True
 
         time.sleep(.025)
 

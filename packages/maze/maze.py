@@ -105,23 +105,27 @@ class Maze(object):
     try:
 
       while True:
-        print('looping')
-        time.sleep(1)
+        time.sleep(.5)
         c = sys.stdin.read(1)
         if c == 'e':
-          self.qC.open('L')
+          msg = ['valve','open','L']
+          self.qC.put(msg)
           print('open left')
         elif c == 'd':
-          a.close('L')
+          msg = ['valve','close','L']
+          self.qC.put(msg)
           print('close left')
         elif c == 'c':
-          a.drop('L')
+          msg = ['valve','drop','L']
+          self.qC.put(msg)
           print('drop left')
         elif c == 't':
-          a.open('R')
+          msg = ['valve','open','R']
+          self.qC.put(msg)
           print('open right')
         elif c == 'g':
-          a.close('R')
+          msg = ['valve','close','R']
+          self.qC.put(msg)
           print('close right')
         elif c == 'b':
           msg = ['valve','drop','R']
@@ -132,7 +136,9 @@ class Maze(object):
           c = sys.stdin.read(1)
           while c == '':
             c = sys.stdin.read(1)
-            print ('will set {a} drops'.format(a=c))
+          print ('will set {a} drops'.format(a=c))
+          msg = ['valve','smd',c]
+          self.qC.put(msg)
         elif c == 'j':
           print ('set delay drop : ')
           c = sys.stdin.read(1)
@@ -143,15 +149,17 @@ class Maze(object):
               n *= 10
               n += int(c)
               c = sys.stdin.read(1)
-              while c == '':
-                c = sys.stdin.read(1)
-                print ('will set drop delay {a}'.format(a=n))
+            print ('will set drop delay {a}'.format(a=n))
+          #msg = ['valve','sdd',c]
+          #self.qC.put(msg)
         elif c == 'm':
           print ('set delay multi drop : ')
           c = sys.stdin.read(1)
           while c == '':
             c = sys.stdin.read(1)
           print ('will set multidrop delay {a}'.format(a=c))
+          #msg = ['valve','smdd',c]
+          #self.qC.put(msg)
         elif c == '?' or c == 'h':
             printhelp()
         elif c == 'q':
@@ -199,7 +207,7 @@ if __name__ == '__main__':
     os.makedirs('./logs/')
   dateformat = '%Y/%m/%d %H:%M:%S'
   formatter_str = '%(asctime)s.%(msecs)d - %(name)s - %(levelname)s - %(message)s'
-  subjectname = 'Reed' # 'Reed' 'Sue' 'Jhonny' 'Ben'
+  subjectname = 'Test' # 'Reed' 'Sue' 'Jhonny' 'Ben'
   import datetime
   today = datetime.date.today().strftime("%Y-%m-%d")
   Snum = 0

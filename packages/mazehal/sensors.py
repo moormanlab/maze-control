@@ -57,10 +57,10 @@ class MazeSensors(object):
     logger.debug('MazeSensors id %s ',id(self))
     logger.info('Sensors version {a}'.format(a=SENSORVERSION))
 
-  def _sensorsHandler(self,sensorid):
+  def _sensorsHandler(self,sensor):
     try:
       # recover gpio
-      print(sensorid)
+      logger.info(sensor.pin)
       sensorname = 'U'
       if self.handler is not None:
         self.handler(self,sensorname)
