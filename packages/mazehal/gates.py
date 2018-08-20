@@ -1,7 +1,7 @@
 # Gates control for maze
 # Author: Ariel Burman
 
-GATEVERSION = 1.0
+GATEVERSION = 1.1
 
 import time
 from multiprocessing import Process, Queue, Lock, Value
@@ -252,6 +252,7 @@ class MazeGates(object):
         data = self.queue.get()
         logger.debug('new data %s',data)
         if data[0] == 'exit':
+          logger.info('Exiting Gates Process')
           break
         elif data[0] == 'of':
           p = Process(target=self.gate[data[1]].openGateFast)
@@ -310,14 +311,18 @@ if __name__ == '__main__':
         pass
     gates.closeGateFast('IUL')
     time.sleep(1.5)
+
+    logger.info('Gates Clossing')
     gates.closeAll()
     while gates.isClose('IUR') == False:
         pass
     while gates.isClose('IUL') == False:
         pass
+    logger.info('Gates Test')
     gates.testGates()
     gates.testAllOnce()
     time.sleep(1.5)
+    logger.info('Exiting')
     gates.releaseAll()
     gates.exit()
     p.join()

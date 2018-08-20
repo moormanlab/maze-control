@@ -1,7 +1,7 @@
 # Button control for maze
 # Author: Ariel Burman
 
-BUTTONSVERSION = 1.0
+BUTTONSVERSION = 1.1
 
 import time
 
@@ -61,18 +61,20 @@ class MazeButtons(object):
     logger.debug('MazeButtons id %s ',id(self))
     logger.info('Buttons version {a}'.format(a=BUTTONSVERSION))
 
-  def _buttonsHandler(self):
+  def _buttonsHandler(self,buttonObj):
     try:
+      logger.debug(buttonObj.pin)
+      buttonPin = int(buttonObj.pin[4:])
+      for key,value in buttons.items():
+          if buttonPin == value[0]:
+              buttonName = key
       if self.handler is not None:
-        self.handler(self)
+        self.handler(self,buttonName)
       else:
-        for key in self.button:
-          if self.isPressed(key):
-            logger.debug('key pressed {a}'.format(a=key))
+        logger.debug('button pressed {a}'.format(a=buttonName))
     except Exception as e:
-      logger.debug(e)
-      print('error handled')
-
+      logger.error(e)
+      print('error handled in button module')
 
   def setLedOn(self,key):
     logger.info('New Led %s on',self.button[key].color)
@@ -109,6 +111,7 @@ if __name__ == '__main__':
       for i in bt.button:
           msg = msg + str(i) + '=' + str(bt.isPressed(i)) + '|'
       logger.info(msg)
+      print(msg)
       time.sleep(2)
       for i in range(20):
         bt.setLedPwm('B',i/19)

@@ -1,7 +1,7 @@
 # Hardaware abstraction layer for maze
 # Author: Ariel Burman
 
-MAZEHALVERSION = 1.0
+MAZEHALVERSION = 1.1
 
 import time
 from multiprocessing import Process, Queue
@@ -9,11 +9,11 @@ from multiprocessing import Process, Queue
 import logging
 logger=logging.getLogger(__name__)
 
-from .valves import MazeValves
-from .gates import MazeGates
-from .buttons import MazeButtons
-from .sensors import MazeSensors
-from .sounds import MazeSounds
+from mazehal.valves import MazeValves
+from mazehal.gates import MazeGates
+from mazehal.buttons import MazeButtons
+from mazehal.sensors import MazeSensors
+from mazehal.sounds import MazeSounds
 
 class MazeHal():
 
@@ -28,6 +28,7 @@ class MazeHal():
         self.subject = None
         self.gates = MazeGates()
         self.gatesP=Process(target=self.gates.run)
+        self.gatesP.daemon = True
         self.gatesP.start()
         logger.debug('MazeHal id %s ',id(self))
         logger.info('MazeHal version {a}'.format(a=MAZEHALVERSION))
@@ -76,18 +77,17 @@ class MazeHal():
                     elif msg[1]=='add':
                         self.sounds.addTone(key=msg[2][0],duration=msg[2][1],freq=msg[2][2],volume=msg[2][3])
                 elif msg[0] == 'exit':
-
+                  self.gates.exit()
                   break
                 else:
                   raise NameError('Messege not defined')
                   logger.error('Messegge {a} not defined'.format(a=msg[0]))
             time.sleep(.05)
-
+      except Exception as e:
+        logger.debug('Exception ocurred in module mazehal')
+        logger.debug(e)
       finally:
           pass
-
-
-
 
 if __name__ == '__main__':
   import sys,os
@@ -96,7 +96,7 @@ if __name__ == '__main__':
 
   dateformat = '%Y/%m/%d %H:%M:%S'
   formatter_str = '%(asctime)s.%(msecs)d - %(name)s - %(levelname)s - %(message)s'
-  logfile = 'logs/motors.log'
+  logfile = 'logs/mazehal.log'
 
   logging.basicConfig(filename=logfile,filemode='w+',level=logging.DEBUG,
           format=formatter_str, datefmt=dateformat)
@@ -109,7 +109,8 @@ if __name__ == '__main__':
   p = Process(target=hal._run)
   p.start()
   time.sleep(1)
-  qC.put(['gates','openall'])
+  qC.put(['gate','openall'])
   time.sleep(1)
+  qC.put(['exit'])
   p.join()
 

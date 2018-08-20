@@ -57,21 +57,20 @@ class MazeSensors(object):
     logger.debug('MazeSensors id %s ',id(self))
     logger.info('Sensors version {a}'.format(a=SENSORVERSION))
 
-  def _sensorsHandler(self,sensor):
+  def _sensorsHandler(self,sensorObj):
     try:
-      # recover gpio
-      logger.info(sensor.pin)
-      sensorname = 'U'
+      logger.info(sensorObj.pin)
+      sensorPin = int(sensorObj.pin[4:])
+      for key,value in sensors.items():
+          if value == sensorPin:
+              sensorName = key
       if self.handler is not None:
-        self.handler(self,sensorname)
+        self.handler(self,sensorName)
       else:
-        logger.debug('key pressed {a}'.format(a=sensorname))
-        for key in self.sensor:
-          if self.isPressed(key):
-            logger.debug('key pressed {a}'.format(a=key))
+        logger.debug('Sensor activated {a}'.format(a=sensorName))
     except Exception as e:
-      logger.debug(e)
-      print('error handled')
+      logger.error(e)
+      print('error handled module sensor')
 
   def isPressed(self,key):
     return self.sensor[key].isPressed()
