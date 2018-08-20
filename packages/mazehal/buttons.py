@@ -64,7 +64,7 @@ class MazeButtons(object):
   def _buttonsHandler(self,buttonObj):
     try:
       logger.debug(buttonObj.pin)
-      buttonPin = int(buttonObj.pin[4:])
+      buttonPin = int(str(buttonObj.pin)[4:])
       for key,value in buttons.items():
           if buttonPin == value[0]:
               buttonName = key

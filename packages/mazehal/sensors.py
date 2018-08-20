@@ -60,7 +60,7 @@ class MazeSensors(object):
   def _sensorsHandler(self,sensorObj):
     try:
       logger.info(sensorObj.pin)
-      sensorPin = int(sensorObj.pin[4:])
+      sensorPin = int(str(sensorObj.pin)[4:])
       for key,value in sensors.items():
           if value == sensorPin:
               sensorName = key
