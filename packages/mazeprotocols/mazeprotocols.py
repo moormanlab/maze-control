@@ -14,7 +14,12 @@ class MazeProtocols(object):
     self.qC = queueCommands
     self.qR = queueResponses
    
+  def __del__(self):
+    self.exit()
+
   ## Buttons ##
+
+  ## Sensors ##
 
   def lastSensorActive(self):
     self.qC.put(['sensor','last'])
@@ -35,7 +40,7 @@ class MazeProtocols(object):
     else:
       raise NameError('Unespected error')
 
-  ## Gates ####
+  ## Valves ####
 
   def drop(self,key):
     msg = ['valve','drop',key]
@@ -51,6 +56,8 @@ class MazeProtocols(object):
     msg = ['valve','smd',num]
     self.qC.put(msg)
     logger.debug(msg)
+
+  ## Gates ##
 
   def openGate(self,key):
     msg = ['gate','open',key]

@@ -70,6 +70,7 @@ class Maze(object):
     self.protocol = Protokol(queueCommands=self.qC,queueResponses=self.qR)
     self.protocol.init()
     self.protocolP = Process(target=self.protocol.run)
+    self.protocolP.daemon = True
 
     if 'sensorHandler' in dir(self.protocol):
       sensorHandler = self.protocol.sensorHandler
@@ -163,6 +164,9 @@ class Maze(object):
         elif c == '?' or c == 'h':
             printhelp()
         elif c == 'q':
+            self.qC.put(['exit'])
+            self.halP.join()
+            #self.protocolP.terminate()
             print ('exiting')
             break
     except IOError:
@@ -181,9 +185,8 @@ class Maze(object):
         print ('#####FINALYY#######')
         termios.tcsetattr(fd, termios.TCSAFLUSH, oldterm)
         fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
+        #self.halP.terminate()
         self.exit()
-#        self.protocolP.join()
-#        self.halP.join()
 
   def forceOpenAllGates(self):
     msg = ['gate','openAllNow']
@@ -224,7 +227,7 @@ if __name__ == '__main__':
 
   logger.info('maze test')
   #maze = Maze('skinner','Skinner')
-  maze = Maze('classic','Classic')
+  maze = Maze('alternateblock','AlternateBlock')
   maze.start()
   
   try:
@@ -234,8 +237,7 @@ if __name__ == '__main__':
   except Exception as inst:
     print ('im heeeeeereeeeeeEEEEEEEEEEEEEEEEEEEEEE')
     print(inst)
-
-    logger.warning(type(inst))
-    logger.warning(inst.args)
+    logger.error(type(inst))
+    logger.error(inst.args)
     maze.exit()
     sys.exit()

@@ -27,14 +27,13 @@ class MazeHal():
         self.sounds = MazeSounds()
         self.subject = None
         self.gates = MazeGates()
-        self.gatesP=Process(target=self.gates.run)
-        self.gatesP.daemon = True
-        self.gatesP.start()
         logger.debug('MazeHal id %s ',id(self))
         logger.info('MazeHal version {a}'.format(a=MAZEHALVERSION))
 
     def _run(self):
       try:
+        self.gatesP=Process(target=self.gates.run)
+        self.gatesP.start()
         while True:
             #leer de la cola
             if self.qC.empty() is False:
@@ -78,6 +77,7 @@ class MazeHal():
                         self.sounds.addTone(key=msg[2][0],duration=msg[2][1],freq=msg[2][2],volume=msg[2][3])
                 elif msg[0] == 'exit':
                   self.gates.exit()
+                  self.gatesP.join()
                   break
                 else:
                   raise NameError('Messege not defined')
@@ -109,8 +109,8 @@ if __name__ == '__main__':
   p = Process(target=hal._run)
   p.start()
   time.sleep(1)
-  qC.put(['gate','openall'])
-  time.sleep(1)
+  qC.put(['gate','openAll'])
+  time.sleep(3)
   qC.put(['exit'])
   p.join()
 

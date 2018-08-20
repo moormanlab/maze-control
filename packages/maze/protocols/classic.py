@@ -9,7 +9,7 @@ import logging
 logger=logging.getLogger(__name__)
 
 PROTOCOL_NAME= 'Classic'
-PROTOCOL_VERSION = '1.0'
+PROTOCOL_VERSION = '1.1'
 
 import numpy as np
 
@@ -37,6 +37,22 @@ class Classic (MazeProtocols):
     self.addTone(2,duration=1.0,freq=8000,volume=1.0)
     logger.info('set multidrop to 5')
     time.sleep(2)
+    pass # leave this line in case 'init' is empty
+
+  def exit(self):
+    # ending protocol. cleanup code. probably loggin stats.
+    print('bye bye')
+    pass # leave this line in case 'exit' is empty
+
+#  def buttonHandler(obj,button):
+#      ''' If you dont use a handler this function should be commented'''
+#      pass
+#
+#  def sensorHandler(obj,sensor):
+#      ''' If you dont use a handler this function should be commented'''
+#      pass
+
+  # Write your own methods
 
   def chooseNextTone(self):
     a = np.random.random()
@@ -48,13 +64,6 @@ class Classic (MazeProtocols):
   def myFunction(self,param):
     logger.debug(param)
 
-#  def buttonHandler(obj):
-#      ''' If you dont use a handler this function should be commented'''
-#      pass
-#
-#  def sensorHandler(obj):
-#      ''' If you dont use a handler this function should be commented'''
-#      pass
 
   def run(self):
     ''' 
@@ -167,9 +176,5 @@ class Classic (MazeProtocols):
         time.sleep(.025)
 
     except Exception as e:
+      logger.error(e)
       print(e)
-    finally:
-      print('Program terminated')
-
-
-
