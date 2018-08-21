@@ -284,6 +284,7 @@ class MazeGates(object):
           msg = msg + "{index} ".format(index=key)
       logger.debug(msg)
       time.sleep(0.1)
+    self.releaseAll()
     
 
 if __name__ == '__main__':

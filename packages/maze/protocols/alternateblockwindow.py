@@ -37,6 +37,8 @@ class AlternateBlockWindow (MazeProtocols):
     logger.info('set multidrop to 3')
     self.trialNum = 0
     self.rewardDone = False
+    self.timeInitTraining = 0
+    self.trialInit = 0
     self.addTone(1,duration=1.0,freq=1000,volume=1.0)
     self.addTone(2,duration=1.0,freq=8000,volume=1.0)
     logger.info('Tone 1 asociated with Left 1 kHz')
@@ -76,7 +78,7 @@ class AlternateBlockWindow (MazeProtocols):
 
   def printStats(self):
     tt = time.time() - self.timeInitTraining
-    print ('Trial Num: {c} | Total time = {a} minutes {b} seconds'.format(a=int(tt/60),b=int(tt)%60),c = self.trialNum)
+    print ('Trial Num: {c} | Total time = {a} minutes {b} seconds'.format(a=int(tt/60),b=int(tt)%60,c = self.trialNum))
 
   def run(self):
     ''' 
@@ -90,8 +92,8 @@ class AlternateBlockWindow (MazeProtocols):
       # waiting to rat to pass the sensor
       while self.isSensorActive('C')==False:
           pass
-      self.startTrial()
       self.timeInitTraining = time.time()
+      self.startTrial()
       while True:
         self.myFunction(self.state)
         if self.state == 'start':

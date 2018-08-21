@@ -82,7 +82,7 @@ class MazeHal():
                 else:
                   raise NameError('Messege not defined')
                   logger.error('Messegge {a} not defined'.format(a=msg[0]))
-            time.sleep(.05)
+            time.sleep(.01)
       except Exception as e:
         logger.debug('Exception ocurred in module mazehal')
         logger.debug(e)
