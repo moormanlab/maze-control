@@ -208,8 +208,8 @@ if __name__ == '__main__':
   import sys,os
   if not os.path.exists('./logs/'):
     os.makedirs('./logs/')
-  dateformat = '%Y/%m/%d %H:%M:%S'
-  formatter_str = '%(asctime)s.%(msecs)d - %(name)s - %(levelname)s - %(message)s'
+  dateformat = '%H:%M:%S'
+  formatter_str = '%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s'
   subjectname = 'Test' # 'Reed' 'Sue' 'Jhonny' 'Ben'
   import datetime
   today = datetime.date.today().strftime("%Y-%m-%d")
@@ -224,10 +224,10 @@ if __name__ == '__main__':
 
   logging.basicConfig(filename=logfile,filemode='w+',level=logging.DEBUG,
          format=formatter_str, datefmt=dateformat)
-
+  logger.info('Today\'s date: '+today)
   logger.info('maze test')
   #maze = Maze('skinner','Skinner')
-  maze = Maze('alternateblock','AlternateBlock')
+  maze = Maze('alternateblockwindow','AlternateBlockWindow')
   maze.start()
   
   try:
@@ -235,7 +235,7 @@ if __name__ == '__main__':
     print('im here')
 
   except Exception as inst:
-    print ('im heeeeeereeeeeeEEEEEEEEEEEEEEEEEEEEEE')
+    print ('Exception ocurred')
     print(inst)
     logger.error(type(inst))
     logger.error(inst.args)
