@@ -227,7 +227,10 @@ if __name__ == '__main__':
   logger.info('Today\'s date: '+today)
   logger.info('maze test')
   #maze = Maze('skinner','Skinner')
-  maze = Maze('alternateblockwindow','AlternateBlockWindow')
+  protocolFile = 'blockchoice'
+  protocolClass = 'BlockChoice'
+  protocolOption = None
+  maze = Maze(protocolFile,protocolClass)
   maze.start()
   
   try:
