@@ -33,7 +33,7 @@ class BlockChoice (MazeProtocols):
     self.closeGate('IBR')
     self.rewardDone = False
     self.toneDone = False
-    self.setMultiDrop(3)
+    self.setMultiDrop(4)
     logger.info('set multidrop to 3')
     self.trialNum = 0
     self.rewardDone = False
@@ -50,6 +50,7 @@ class BlockChoice (MazeProtocols):
 
   def exit(self):
     # ending protocol. cleanup code. probably loggin stats.
+    self.printStats()
     print('bye bye')
     pass # leave this line in case 'exit' is empty
 
@@ -77,15 +78,14 @@ class BlockChoice (MazeProtocols):
     logger.info('Played tone {a} trialNum {b}'.format(a=nextTone,b=self.trialNum))
     self.trialInit = time.time()
     self.trialCount[nextTone-1] +=1
-    self.printStats()
 
   def printStats(self):
     tt = time.time() - self.timeInitTraining
     msg1 = 'Trial Num: {c} | Total time = {a} minutes {b} seconds'.format(a=int(tt/60),b=int(tt)%60,c = self.trialNum)
     msg2 = 'Total trial: {a}/{b} = {c}% | Left: {d}/{e} = {f}% | Right: {g}/{h} = {i}%'.format(
-        a = sum(self.trialCorrect), b = sum(self.trialCount),c=int(sum(self.trialCorrect)/sum(self.trialCount)),
-        d = self.trialCorrect[0] , e = self.trialCount[0] , f = int(100*self.trialCorrect[0]/(self.trialCount[0]+0.0001)),
-        g = self.trialCorrect[1] , h = self.trialCount[1] , i = int(100*self.trialCorrect[1]/(self.trialCount[1]+0.0001)))
+        a = sum(self.trialCorrect), b = sum(self.trialCount),c=round(100*sum(self.trialCorrect)/sum(self.trialCount)),
+        d = self.trialCorrect[0] , e = self.trialCount[0] , f = round(100*self.trialCorrect[0]/(self.trialCount[0]+0.0001)),
+        g = self.trialCorrect[1] , h = self.trialCount[1] , i = round(100*self.trialCorrect[1]/(self.trialCount[1]+0.0001)))
     print (msg1)
     print (msg2)
     logger.info(msg1)
@@ -139,14 +139,16 @@ class BlockChoice (MazeProtocols):
             self.openGate('IBL')
             self.state = 'reward left'
             if self.rewardDone == False:
+              self.rewardDone = True
               now = time.time()
               if now > (self.trialInit + self.rewardWindow):
                 logger.info('Not Giving reward, exceeding window')
+              elif self.chooseTone(self.trialNum)==2:
+                logger.info('Not Giving reward, wrong side')
               else:
-                  logger.info('Giving reward')
-                  self.multiDrop('L')
-                  self.trialCorrect[self.chooseTone(self.trialNum)-1] += 1
-                  self.rewardDone = True
+                logger.info('Giving reward')
+                self.multiDrop('L')
+                self.trialCorrect[self.chooseTone(self.trialNum)-1] += 1
 
         elif self.state == 'reward left':
           #if self.lastSensorActive()=='BL':
@@ -168,6 +170,7 @@ class BlockChoice (MazeProtocols):
             self.openGate('OUL')
             self.openGate('OUR')
             self.state = 'start'
+            self.printStats()
             self.startTrial()
 
 
@@ -180,12 +183,15 @@ class BlockChoice (MazeProtocols):
             self.state = 'reward right'
             if self.rewardDone == False:
               now = time.time()
+              self.rewardDone = True
               if now > (self.trialInit + self.rewardWindow):
                 logger.info('NOT Giving reward, exceeding window')
+              elif self.chooseTone(self.trialNum)==1:
+                logger.info('Not Giving reward, wrong side')
               else:
-                  logger.info('Giving reward')
-                  self.multiDrop('R')
-                  self.rewardDone = True
+                logger.info('Giving reward')
+                self.multiDrop('R')
+                self.trialCorrect[self.chooseTone(self.trialNum)-1] += 1
 
         elif self.state == 'reward right':
           #if self.lastSensorActive()=='BR':
@@ -208,6 +214,7 @@ class BlockChoice (MazeProtocols):
             self.openGate('OUL')
             self.openGate('OUR')
             self.state = 'start'
+            self.printStats()
             self.startTrial()
 
         time.sleep(.01)
