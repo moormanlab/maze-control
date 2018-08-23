@@ -85,9 +85,10 @@ if __name__=='__main__':
 
   sample_rate = 44100
   audio = MazeSounds()
-  audio.addTone(key=1,duration=1.0,freq=1000.0,volume=1.0,sample_rate=sample_rate)
-  audio.addTone(key=2,duration=1.0,freq=8000.0,volume=1.0,sample_rate=sample_rate)
+  audio.addTone(key=1,duration=3.0,freq=1000.0,volume=0.7,sample_rate=sample_rate)
+  audio.addTone(key=2,duration=3.0,freq=8000.0,volume=1.0,sample_rate=sample_rate)
   
+  import time
   t = np.linspace(0, 2.0, int(2.0 * sample_rate), False)
   buff = np.array([np.sin(1000 * t * 2 * np.pi),np.sin(4000 * t * 2 * np.pi)])
   logger.debug(str(buff))
@@ -99,8 +100,10 @@ if __name__=='__main__':
   print(audio.isPlaying())
   audio.play(1)
   print(audio.isPlaying())
+  time.sleep(2)
   audio.play_obj.wait_done()
   audio.playBlocking(2)
+  time.sleep(2)
   print(audio.isPlaying())
   audio.play(3)
   print(audio.isPlaying())

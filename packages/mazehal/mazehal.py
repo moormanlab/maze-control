@@ -1,7 +1,7 @@
 # Hardaware abstraction layer for maze
 # Author: Ariel Burman
 
-MAZEHALVERSION = 1.1
+MAZEHALVERSION = 1.2
 
 import time
 from multiprocessing import Process, Queue
@@ -49,12 +49,17 @@ class MazeHal():
                     elif msg[1] == 'close':
                         self.gates.closeGate(msg[2])
                     elif msg[1] == 'openF':
-                        self.gates.openGate(msg[2])
+                        self.gates.openGateFast(msg[2])
                     elif msg[1] == 'closeF':
-                        self.gates.closeGate(msg[2])
+                        self.gates.closeGateFast(msg[2])
                 elif msg[0] == 'sensor':
-                    resp = self.sensors.isPressed(msg[1])
-                    self.qR.put(['sensor',resp])
+                    if msg[1] == 'last':
+                        resp = self.sensors.getLastSensorActive()
+                        self.qR.put(['sensor',resp])
+                    else:
+                        # TODO should check if it is a valid sensor
+                        resp = self.sensors.isPressed(msg[1])
+                        self.qR.put(['sensor',resp])
                 elif msg[0] == 'valve':
                     if msg[1] == 'drop':
                         self.valves.drop(msg[2])

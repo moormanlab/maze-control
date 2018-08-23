@@ -1,7 +1,7 @@
 # Sensors control for maze
 # Author: Ariel Burman
 
-SENSORVERSION = 1.1
+SENSORVERSION = 1.2
 
 import time
 
@@ -48,6 +48,7 @@ class MazeSensors(object):
   def __init__(self,handler=None):
     self.sensor = {}
     self.handler = handler
+    self.lastSensorActive = None
     for key in sensors:
       self.sensor[key] = Sensor(gpioN=sensors[key])
 
@@ -68,6 +69,7 @@ class MazeSensors(object):
         self.handler(self,sensorName)
       else:
         logger.debug('Sensor activated {a}'.format(a=sensorName))
+        self.lastSensorActive = sensorName
     except Exception as e:
       logger.error(e)
       print('error handled module sensor')
@@ -75,6 +77,8 @@ class MazeSensors(object):
   def isPressed(self,key):
     return self.sensor[key].isPressed()
 
+  def getLastSensorActive(self):
+    return self.lastSensorActive
 
 if __name__ == '__main__':
   import sys,os

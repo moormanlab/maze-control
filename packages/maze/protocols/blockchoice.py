@@ -9,7 +9,7 @@ import logging
 logger=logging.getLogger(__name__)
 
 PROTOCOL_NAME= 'BlockChoice'
-PROTOCOL_VERSION = '1.0'
+PROTOCOL_VERSION = '1.1'
 
 import numpy as np
 
@@ -23,34 +23,35 @@ class BlockChoice (MazeProtocols):
     self.rewardWindow = 4.0
     logger.info('Block Size: {a}'.format(a=self.blockSize))
     self.state = 'start'
-    self.openGate('IUL')
-    self.openGate('IUR')
-    self.openGate('OUL')
-    self.openGate('OUR')
-    self.openGate('OBL') # maybe closed
-    self.openGate('OBR') # maybe closed
-    self.closeGate('IBL')
-    self.closeGate('IBR')
+    self.openGateFast('IUL')
+    self.openGateFast('IUR')
+    self.openGateFast('OUL')
+    self.openGateFast('OUR')
+    self.openGateFast('OBL') # maybe closed
+    self.openGateFast('OBR') # maybe closed
+    self.closeGateFast('IBL')
+    self.closeGateFast('IBR')
     self.rewardDone = False
     self.toneDone = False
-    self.setMultiDrop(4)
-    logger.info('set multidrop to 3')
+    self.multidropNum = 3
+    self.setMultiDrop(self.multidropNum)
+    logger.info('set multidrop to {a}'.format(a=self.multidropNum))
     self.trialNum = 0
     self.rewardDone = False
     self.timeInitTraining = 0
     self.trialInit = 0
     self.trialCount = [0,0]
     self.trialCorrect = [0,0]
-    self.addTone(1,duration=1.0,freq=1000,volume=1.0)
-    self.addTone(2,duration=1.0,freq=8000,volume=1.0)
-    logger.info('Tone 1 asociated with Left 1 kHz')
-    logger.info('Tone 2 asociated with Right 8 kHz')
-    time.sleep(1)
+    self.addTone(2,duration=1.0,freq=1000,volume=0.7)
+    self.addTone(1,duration=1.0,freq=8000,volume=1.0)
+    logger.info('Tone 1 asociated with Left 8 kHz')
+    logger.info('Tone 2 asociated with Right 1 kHz')
+    time.sleep(.1)
     pass # leave this line in case 'init' is empty
 
   def exit(self):
     # ending protocol. cleanup code. probably loggin stats.
-    self.printStats()
+    #self.printStats()
     print('bye bye')
     pass # leave this line in case 'exit' is empty
 
@@ -100,6 +101,7 @@ class BlockChoice (MazeProtocols):
     try:
       self.trialNum = 0
       # waiting to rat to pass the sensor
+      #while self.getLastSensorActive()!='C':
       while self.isSensorActive('C')==False:
           pass
       self.timeInitTraining = time.time()
@@ -107,36 +109,36 @@ class BlockChoice (MazeProtocols):
       while True:
         self.myFunction(self.state)
         if self.state == 'start':
-          #if self.lastSensorActive()=='UL':
           self.rewardDone = False
 
+          #if self.getLastSensorActive()=='UL':
           if self.isSensorActive('UL')==True:
             logger.info('Rat at {a}'.format(a='UL'))
             #the rat went left
-            self.closeGate('IBL')
-            self.closeGate('IBR')
-            self.closeGate('IUR')
-            self.openGate('OBL')
+            self.closeGateFast('IBL')
+            self.closeGateFast('IBR')
+            self.closeGateFast('IUR')
+            self.openGateFast('OBL')
             self.state='going left'
             logger.info('reward on left')
-          #elif self.lastSensorActive()=='UR':
+          #elif self.getLastSensorActive()=='UR':
           elif self.isSensorActive('UR')==True:
             logger.info('Rat at {a}'.format(a='UR'))
             #the rat went right
-            self.closeGate('IBL')
-            self.closeGate('IBR')
-            self.closeGate('IUL')
-            self.openGate('OBR')
+            self.closeGateFast('IBL')
+            self.closeGateFast('IBR')
+            self.closeGateFast('IUL')
+            self.openGateFast('OBR')
             self.state='going right'
             # check for reward
             logger.info('reward on right')
 
         elif self.state == 'going left':
-          #if self.lastSensorActive()=='L':
+          #if self.getLastSensorActive()=='L':
           if self.isSensorActive('L')==True:
             logger.info('Rat at {a}'.format(a='L'))
-            self.closeGate('IUL')
-            self.openGate('IBL')
+            self.closeGateFast('IUL')
+            self.openGateFast('IBL')
             self.state = 'reward left'
             if self.rewardDone == False:
               self.rewardDone = True
@@ -151,35 +153,36 @@ class BlockChoice (MazeProtocols):
                 self.trialCorrect[self.chooseTone(self.trialNum)-1] += 1
 
         elif self.state == 'reward left':
-          #if self.lastSensorActive()=='BL':
+          #if self.getLastSensorActive()=='BL':
           if self.isSensorActive('BL')==True:
             logger.info('Rat at {a}'.format(a='BL'))
-            self.openGate('IUL')
-            self.openGate('IUR')
-            self.closeGate('OUL')
+            self.openGateFast('IUL')
+            self.openGateFast('IUR')
+            self.closeGateFast('OUL')
             self.state = 'returning left'
 
+          #if self.getLastSensorActive()=='L':
           if self.isSensorActive('L')==True:
             logger.info('Rat at {a}'.format(a='L'))
 
         elif self.state == 'returning left':
-          #if self.lastSensorActive()=='C':
+          #if self.getLastSensorActive()=='C':
           if self.isSensorActive('C')==True:
             logger.info('Rat at {a}'.format(a='C'))
-            self.closeGate('OBL')
-            self.openGate('OUL')
-            self.openGate('OUR')
+            self.closeGateFast('OBL')
+            self.openGateFast('OUL')
+            self.openGateFast('OUR')
             self.state = 'start'
             self.printStats()
             self.startTrial()
 
 
         elif self.state == 'going right':
-          #if self.lastSensorActive()=='R':
+          #if self.getLastSensorActive()=='R':
           if self.isSensorActive('R')==True:
             logger.info('Rat at {a}'.format(a='R'))
-            self.closeGate('IUR')
-            self.openGate('IBR')
+            self.closeGateFast('IUR')
+            self.openGateFast('IBR')
             self.state = 'reward right'
             if self.rewardDone == False:
               now = time.time()
@@ -194,25 +197,26 @@ class BlockChoice (MazeProtocols):
                 self.trialCorrect[self.chooseTone(self.trialNum)-1] += 1
 
         elif self.state == 'reward right':
-          #if self.lastSensorActive()=='BR':
+          #if self.getLastSensorActive()=='BR':
           if self.isSensorActive('BR')==True:
             logger.info('Rat at {a}'.format(a='BR'))
-            self.openGate('IUL')
-            self.openGate('IUR')
-            self.closeGate('OUR')
+            self.openGateFast('IUL')
+            self.openGateFast('IUR')
+            self.closeGateFast('OUR')
 
             self.state = 'returning right'
 
+          #if self.getLastSensorActive()=='R':
           if self.isSensorActive('R')==True:
             logger.info('Rat at {a}'.format(a='R'))
                 
         elif self.state == 'returning right':
-          #if self.lastSensorActive()=='C':
+          #if self.getLastSensorActive()=='C':
           if self.isSensorActive('C')==True:
             logger.info('Rat at {a}'.format(a='C'))
-            self.closeGate('OBR')
-            self.openGate('OUL')
-            self.openGate('OUR')
+            self.closeGateFast('OBR')
+            self.openGateFast('OUL')
+            self.openGateFast('OUR')
             self.state = 'start'
             self.printStats()
             self.startTrial()

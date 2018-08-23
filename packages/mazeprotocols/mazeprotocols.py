@@ -1,7 +1,7 @@
 # Protocol base class for maze training
 # Author: Ariel Burman
 
-PROTOCOLSVERSION = 1.1
+PROTOCOLSVERSION = 1.2
 
 import time
 
@@ -14,21 +14,25 @@ class MazeProtocols(object):
     self.qC = queueCommands
     self.qR = queueResponses
    
-  def __del__(self):
-    self.exit()
+#  def __del__(self):
+#    print('hhhhe')
+#    logger.debug(dir(self))
+#    logger.debug(id(self))
+#    self.exit()
 
   ## Buttons ##
 
   ## Sensors ##
 
-  def lastSensorActive(self):
+  def getLastSensorActive(self):
     self.qC.put(['sensor','last'])
     while self.qR.empty():
-      time.sleep(1)
-      print('bloqued')
-
+      time.sleep(0.01)
     a = self.qR.get()
-    return a
+    if a[0]=='sensor':
+      return a[1]
+    else:
+      raise NameError('Unespected error')
 
   def isSensorActive(self,key):
     self.qC.put(['sensor',key])
@@ -66,6 +70,16 @@ class MazeProtocols(object):
 
   def closeGate(self,key):
     msg = ['gate','close',key]
+    self.qC.put(msg)
+    logger.debug(msg)
+
+  def openGateFast(self,key):
+    msg = ['gate','openF',key]
+    self.qC.put(msg)
+    logger.debug(msg)
+
+  def closeGateFast(self,key):
+    msg = ['gate','closeF',key]
     self.qC.put(msg)
     logger.debug(msg)
 

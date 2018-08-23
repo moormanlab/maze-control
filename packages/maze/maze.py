@@ -200,6 +200,7 @@ class Maze(object):
 
   def exit(self):
     logger.warning('exiting')
+    #self.protocol.exit()
     self.halP.terminate()
     self.protocolP.terminate()
     sys.exit()
