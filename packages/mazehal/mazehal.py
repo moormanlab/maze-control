@@ -20,12 +20,10 @@ class MazeHal():
     def __init__(self,queueCommands,queueResponses,sensorHandler=None,buttonHandler=None):
         self.qC = queueCommands
         self.qR = queueResponses
-#        self.p = []
         self.valves = MazeValves()
         self.buttons = MazeButtons(buttonHandler)
         self.sensors = MazeSensors(sensorHandler)
         self.sounds = MazeSounds()
-        self.subject = None
         self.gates = MazeGates()
         logger.debug('MazeHal id %s ',id(self))
         logger.info('MazeHal version {a}'.format(a=MAZEHALVERSION))

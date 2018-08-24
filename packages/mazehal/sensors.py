@@ -65,19 +65,21 @@ class MazeSensors(object):
       for key,value in sensors.items():
           if value == sensorPin:
               sensorName = key
+      logger.debug('Sensor activated {a}'.format(a=sensorName))
+      logger.debug('Last sensor was {a}'.format(a=self.lastSensorActive))
+      self.lastSensorActive = sensorName
       if self.handler is not None:
-        self.handler(self,sensorName)
-      else:
-        logger.debug('Sensor activated {a}'.format(a=sensorName))
-        self.lastSensorActive = sensorName
+        self.handler(sensorName)
     except Exception as e:
       logger.error(e)
+      logger.error(str(e))
       print('error handled module sensor')
 
   def isPressed(self,key):
     return self.sensor[key].isPressed()
 
   def getLastSensorActive(self):
+    logger.debug('returning {a}'.format(a=self.lastSensorActive))
     return self.lastSensorActive
 
 if __name__ == '__main__':

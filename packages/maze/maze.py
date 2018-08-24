@@ -67,10 +67,8 @@ class Maze(object):
     self.qC = Queue()
     self.qR = Queue()
 
+
     self.protocol = Protokol(queueCommands=self.qC,queueResponses=self.qR)
-    self.protocol.init()
-    self.protocolP = Process(target=self.protocol.run)
-    self.protocolP.daemon = True
 
     if 'sensorHandler' in dir(self.protocol):
       sensorHandler = self.protocol.sensorHandler
@@ -85,6 +83,10 @@ class Maze(object):
     self.hal = MazeHal(queueCommands=self.qC,queueResponses=self.qR,
             sensorHandler=sensorHandler,buttonHandler=buttonHandler)
     self.halP = Process(target=self.hal._run)
+
+    self.protocol.init()
+    self.protocolP = Process(target=self.protocol.run)
+    self.protocolP.daemon = True
 
   def start(self):
     if self.protocol == None:
@@ -166,7 +168,6 @@ class Maze(object):
         elif c == 'q':
             self.qC.put(['exit'])
             self.halP.join()
-            #self.protocolP.terminate()
             print ('exiting')
             break
     except IOError:
@@ -185,7 +186,6 @@ class Maze(object):
         print ('#####FINALYY#######')
         termios.tcsetattr(fd, termios.TCSAFLUSH, oldterm)
         fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
-        #self.halP.terminate()
         self.exit()
 
   def forceOpenAllGates(self):
@@ -200,9 +200,12 @@ class Maze(object):
 
   def exit(self):
     logger.warning('exiting')
-    #self.protocol.exit()
-    self.halP.terminate()
+    #self.halP.terminate()
+    print('first')
     self.protocolP.terminate()
+    self.protocolP.join()
+    time.sleep(.5)
+    print('second')
     sys.exit()
       
 if __name__ == '__main__':
@@ -211,7 +214,7 @@ if __name__ == '__main__':
     os.makedirs('./logs/')
   dateformat = '%H:%M:%S'
   formatter_str = '%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s'
-  subjectname = 'Test' # 'Reed' 'Sue' 'Jhonny' 'Ben'
+  subjectname = 'Reed' # 'Reed' 'Sue' 'Jhonny' 'Ben'
   import datetime
   today = datetime.date.today().strftime("%Y-%m-%d")
   Snum = 0

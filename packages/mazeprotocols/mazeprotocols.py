@@ -4,12 +4,13 @@
 PROTOCOLSVERSION = 1.2
 
 import time
-
+import signal,sys
 import logging
 logger=logging.getLogger(__name__)
 
 class MazeProtocols(object):
   def __init__(self,queueCommands,queueResponses):
+    signal.signal(signal.SIGTERM, self.__exit_gracefully)  
     logger.info('Maze Protocols version {a}'.format(a=PROTOCOLSVERSION))
     self.qC = queueCommands
     self.qR = queueResponses
@@ -19,6 +20,11 @@ class MazeProtocols(object):
 #    logger.debug(dir(self))
 #    logger.debug(id(self))
 #    self.exit()
+
+  def __exit_gracefully(self,a,b):
+    print('exiting mazeprotocol')
+    self.exit()
+    sys.exit()
 
   ## Buttons ##
 

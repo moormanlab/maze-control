@@ -42,16 +42,17 @@ class BlockChoice (MazeProtocols):
     self.trialInit = 0
     self.trialCount = [0,0]
     self.trialCorrect = [0,0]
-    self.addTone(2,duration=1.0,freq=1000,volume=0.7)
-    self.addTone(1,duration=1.0,freq=8000,volume=1.0)
-    logger.info('Tone 1 asociated with Left 8 kHz')
-    logger.info('Tone 2 asociated with Right 1 kHz')
+    self.addTone(1,duration=1.0,freq=1000,volume=0.7)
+    self.addTone(2,duration=1.0,freq=8000,volume=1.0)
+    logger.info('Tone 1 asociated with Left 1 kHz')
+    logger.info('Tone 2 asociated with Right 8 kHz')
     time.sleep(.1)
+    self.myLastSensor = None
     pass # leave this line in case 'init' is empty
 
   def exit(self):
     # ending protocol. cleanup code. probably loggin stats.
-    #self.printStats()
+    self.printStats()
     print('bye bye')
     pass # leave this line in case 'exit' is empty
 
@@ -59,8 +60,13 @@ class BlockChoice (MazeProtocols):
 #      ''' If you dont use a handler this function should be commented'''
 #      pass
 #
-#  def sensorHandler(obj,sensor):
+#  def sensorHandler(self,sensor):
 #      ''' If you dont use a handler this function should be commented'''
+#      print('sensor activated {a}'.format(a=sensor))
+#      print(id(self))
+#      print(dir(self))
+#      self.trialNum +=1
+#      self.myLastSensor = sensor
 #      pass
 
   # Write your own methods
@@ -84,7 +90,7 @@ class BlockChoice (MazeProtocols):
     tt = time.time() - self.timeInitTraining
     msg1 = 'Trial Num: {c} | Total time = {a} minutes {b} seconds'.format(a=int(tt/60),b=int(tt)%60,c = self.trialNum)
     msg2 = 'Total trial: {a}/{b} = {c}% | Left: {d}/{e} = {f}% | Right: {g}/{h} = {i}%'.format(
-        a = sum(self.trialCorrect), b = sum(self.trialCount),c=round(100*sum(self.trialCorrect)/sum(self.trialCount)),
+        a = sum(self.trialCorrect), b = sum(self.trialCount),c=round(100*sum(self.trialCorrect)/(sum(self.trialCount)+0.0001)),
         d = self.trialCorrect[0] , e = self.trialCount[0] , f = round(100*self.trialCorrect[0]/(self.trialCount[0]+0.0001)),
         g = self.trialCorrect[1] , h = self.trialCount[1] , i = round(100*self.trialCorrect[1]/(self.trialCount[1]+0.0001)))
     print (msg1)
@@ -111,7 +117,7 @@ class BlockChoice (MazeProtocols):
         if self.state == 'start':
           self.rewardDone = False
 
-          #if self.getLastSensorActive()=='UL':
+          #if self.myLastSensor=='UL':
           if self.isSensorActive('UL')==True:
             logger.info('Rat at {a}'.format(a='UL'))
             #the rat went left
@@ -121,7 +127,7 @@ class BlockChoice (MazeProtocols):
             self.openGateFast('OBL')
             self.state='going left'
             logger.info('reward on left')
-          #elif self.getLastSensorActive()=='UR':
+          #elif self.myLastSensor=='UR':
           elif self.isSensorActive('UR')==True:
             logger.info('Rat at {a}'.format(a='UR'))
             #the rat went right
@@ -134,7 +140,7 @@ class BlockChoice (MazeProtocols):
             logger.info('reward on right')
 
         elif self.state == 'going left':
-          #if self.getLastSensorActive()=='L':
+          #if self.myLastSensor=='L':
           if self.isSensorActive('L')==True:
             logger.info('Rat at {a}'.format(a='L'))
             self.closeGateFast('IUL')
@@ -153,7 +159,7 @@ class BlockChoice (MazeProtocols):
                 self.trialCorrect[self.chooseTone(self.trialNum)-1] += 1
 
         elif self.state == 'reward left':
-          #if self.getLastSensorActive()=='BL':
+          #if self.myLastSensor=='BL':
           if self.isSensorActive('BL')==True:
             logger.info('Rat at {a}'.format(a='BL'))
             self.openGateFast('IUL')
@@ -161,12 +167,12 @@ class BlockChoice (MazeProtocols):
             self.closeGateFast('OUL')
             self.state = 'returning left'
 
-          #if self.getLastSensorActive()=='L':
+          #if self.myLastSensor=='L':
           if self.isSensorActive('L')==True:
             logger.info('Rat at {a}'.format(a='L'))
 
         elif self.state == 'returning left':
-          #if self.getLastSensorActive()=='C':
+          #if self.myLastSensor=='C':
           if self.isSensorActive('C')==True:
             logger.info('Rat at {a}'.format(a='C'))
             self.closeGateFast('OBL')
