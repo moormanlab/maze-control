@@ -214,7 +214,7 @@ if __name__ == '__main__':
     os.makedirs('./logs/')
   dateformat = '%H:%M:%S'
   formatter_str = '%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s'
-  subjectname = 'Reed' # 'Reed' 'Sue' 'Jhonny' 'Ben'
+  subjectname = 'Test' # 'Reed' 'Sue' 'Jhonny' 'Ben'
   import datetime
   today = datetime.date.today().strftime("%Y-%m-%d")
   Snum = 0
@@ -231,8 +231,8 @@ if __name__ == '__main__':
   logger.info('Today\'s date: '+today)
   logger.info('maze test')
   #maze = Maze('skinner','Skinner')
-  protocolFile = 'blockchoice'
-  protocolClass = 'BlockChoice'
+  protocolFile = 'randomchoice'
+  protocolClass = 'RandomChoice'
   protocolOption = None
   maze = Maze(protocolFile,protocolClass)
   maze.start()
