@@ -9,7 +9,6 @@ import time
 import importlib
 from importlib import util as imputil
 from multiprocessing import Process, Queue
-from pynput import keyboard
 
 from mazeprotocols import MazeProtocols
 
@@ -199,8 +198,8 @@ if __name__ == '__main__':
   logger.info('Today\'s date: '+today)
   logger.info('maze test')
   #maze = Maze('skinner','Skinner')
-  protocolFile = 'randomchoice'
-  protocolClass = 'RandomChoice'
+  protocolFile = 'blockchoice'
+  protocolClass = 'BlockChoice'
   protocolOption = None
   maze = Maze(protocolFile,protocolClass)
   

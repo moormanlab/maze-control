@@ -36,8 +36,8 @@ class MazeProtocols(object):
 
   def __exit_gracefully(self,a,b):
     print('exiting mazeprotocol')
-    self._mazehal.exit()
     self.exit()
+    self._mazehal.exit()
     #sys.exit()
 
   ## Buttons ##

@@ -31,9 +31,10 @@ class MazeHal(object):
     print('init mazehal')
     self.gatesP.start()
     #self.gatesP.join()
+
   def exit(self):
     self.gates.exit()
-    self.gatesP.join()
+    #self.gatesP.join()
 
   def __del__(self):
     print('exiting mazehal')
