@@ -9,7 +9,7 @@ import logging
 logger=logging.getLogger(__name__)
 
 PROTOCOL_NAME= 'RandomChoice'
-PROTOCOL_VERSION = '1.0'
+PROTOCOL_VERSION = '1.1'
 
 import numpy as np
 
@@ -19,33 +19,32 @@ class RandomChoice (MazeProtocols):
     # initialization
     # put here the code you want to run only once, at first
     logger.info('Protocol: {a}, Version: {b}'.format(a=PROTOCOL_NAME,b=PROTOCOL_VERSION))
-    self.rewardWindow = 4.0
+    self.rewardWindow = 5.0
     logger.info('Reward Window: {a}'.format(a=self.rewardWindow))
     self.state = 'start'
-    self.openGateFast('IUL')
-    self.openGateFast('IUR')
+    self.closeGateFast('IUL')
+    self.closeGateFast('IUR')
     self.openGateFast('OUL')
     self.openGateFast('OUR')
     self.openGateFast('OBL') # maybe closed
     self.openGateFast('OBR') # maybe closed
     self.closeGateFast('IBL')
     self.closeGateFast('IBR')
-    self.rewardDone = False
-    self.toneDone = False
     self.multidropNum = 2
     self.setMultiDrop(self.multidropNum)
     logger.info('set multidrop to {a}'.format(a=self.multidropNum))
     self.trialNum = 0
+    self.rewardDone = False
     self.timeInitTraining = 0
     self.trialInit = 0
     self.currentTrial = ''
     self.trialsCount = {'L':0,'R':0}
     self.trialsCorrect = {'L':0,'R':0}
     self.trials = []
-    self.addTone(2,duration=1.0,freq=1000,volume=0.7)
-    self.addTone(1,duration=1.0,freq=8000,volume=1.0)
-    logger.info('Tone 1 asociated with Left 8 kHz')
-    logger.info('Tone 2 asociated with Right 1 kHz')
+    self.addTone(1,duration=1.0,freq=1000,volume=0.7)
+    self.addTone(2,duration=1.0,freq=8000,volume=1.0)
+    logger.info('Tone 1 asociated with Left 1 kHz')
+    logger.info('Tone 2 asociated with Right 8 kHz')
     time.sleep(.1)
     self.myLastSensor = None
     pass # leave this line in case 'init' is empty
@@ -92,6 +91,13 @@ class RandomChoice (MazeProtocols):
     logger.info('Played tone {a} trialNum {b}'.format(a=nextTone,b=self.trialNum))
     self.trialInit = time.time()
     self.trialsCount[self.currentTrial] +=1
+    time.sleep(1.2)
+    if (self.trialNum % 2):
+      self.openGate('IUL')
+      self.openGate('IUR')
+    else:
+      self.openGate('IUR')
+      self.openGate('IUL')
 
   def printStats(self):
     tt = time.time() - self.timeInitTraining
@@ -177,8 +183,6 @@ class RandomChoice (MazeProtocols):
           #if self.myLastSensor=='BL':
           if self.isSensorActive('BL')==True:
             logger.info('Rat at {a}'.format(a='BL'))
-            self.openGateFast('IUL')
-            self.openGateFast('IUR')
             self.closeGateFast('OUL')
             self.state = 'returning left'
 
@@ -222,8 +226,6 @@ class RandomChoice (MazeProtocols):
           #if self.getLastSensorActive()=='BR':
           if self.isSensorActive('BR')==True:
             logger.info('Rat at {a}'.format(a='BR'))
-            self.openGateFast('IUL')
-            self.openGateFast('IUR')
             self.closeGateFast('OUR')
 
             self.state = 'returning right'

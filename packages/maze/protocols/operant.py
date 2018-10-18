@@ -8,21 +8,21 @@ import time
 import logging
 logger=logging.getLogger(__name__)
 
-PROTOCOL_NAME= 'BlockChoice'
-PROTOCOL_VERSION = '1.2'
 
 import numpy as np
 
+PROTOCOL_NAME= 'Operant'
+PROTOCOL_VERSION = '1.1'
 
-class BlockChoice (MazeProtocols):
+class OperantLeft (MazeProtocols):
   def init(self):
     # initialization
     # put here the code you want to run only once, at first
+    # trainType should be 'L' of 'R'
+    trainType = 'L'
     logger.info('Protocol: {a}, Version: {b}'.format(a=PROTOCOL_NAME,b=PROTOCOL_VERSION))
-    self.blockSize = 10
-    self.rewardWindow = 5.0
-    logger.info('Block Size: {a}'.format(a=self.blockSize))
-    logger.info('Reward Window: {a}'.format(a=self.rewardWindow))
+    self.rewardWindow = 8.0
+    logger.info('Training Type: {a}, Window size: {b}'.format(a=trainType,b=self.rewardWindow))
     self.state = 'start'
     self.closeGateFast('IUL')
     self.closeGateFast('IUR')
@@ -32,17 +32,15 @@ class BlockChoice (MazeProtocols):
     self.openGateFast('OBR') # maybe closed
     self.closeGateFast('IBL')
     self.closeGateFast('IBR')
-    self.multidropNum = 2
+    self.multidropNum = 3
     self.setMultiDrop(self.multidropNum)
     logger.info('set multidrop to {a}'.format(a=self.multidropNum))
     self.trialNum = 0
     self.rewardDone = False
     self.timeInitTraining = 0
+    self.trainingType = trainType
     self.trialInit = 0
-    self.currentTrial = ''
-    self.trialsCount = {'L':0,'R':0}
-    self.trialsCorrect = {'L':0,'R':0}
-    self.trials = []
+    self.trialCorrect = 0
     self.addTone(1,duration=1.0,freq=1000,volume=0.7)
     self.addTone(2,duration=1.0,freq=8000,volume=1.0)
     logger.info('Tone 1 asociated with Left 1 kHz')
@@ -54,7 +52,6 @@ class BlockChoice (MazeProtocols):
   def exit(self):
     # ending protocol. cleanup code. probably loggin stats.
     self.printStats()
-    logger.info(self.trials)
     print('bye bye')
     pass # leave this line in case 'exit' is empty
 
@@ -72,27 +69,19 @@ class BlockChoice (MazeProtocols):
 #      pass
 
   # Write your own methods
-
   
-  def chooseTone(self,trial):
-    return int((trial-1)/self.blockSize) % 2 + 1
-
   def myFunction(self,param):
     logger.debug(param)
 
   def startTrial(self):
     self.trialNum +=1
-    nextTone=self.chooseTone(self.trialNum)
-    if nextTone == 1:
-        self.currentTrial = 'L'
+    if self.trainingType == 'L':
+        nextTone = 1
     else:
-        self.currentTrial = 'R'
-        
-    self.trials.append([self.trialNum, self.currentTrial,0])
+        nextTone = 2
     self.playSound(nextTone)
     logger.info('Played tone {a} trialNum {b}'.format(a=nextTone,b=self.trialNum))
     self.trialInit = time.time()
-    self.trialsCount[self.currentTrial] +=1
     time.sleep(1.2)
     if (self.trialNum % 2):
       self.openGate('IUL')
@@ -103,21 +92,9 @@ class BlockChoice (MazeProtocols):
 
   def printStats(self):
     tt = time.time() - self.timeInitTraining
-    msg1 = 'Trial Num: {c} | Total time = {a} minutes {b} seconds'.format(a=int(tt/60),b=int(tt)%60,c = self.trialNum)
-    msg2 = 'Total trial: {a}/{b} = {c}% | Left: {d}/{e} = {f}% | Right: {g}/{h} = {i}%'.format(
-        a = (self.trialsCorrect['L']+self.trialsCorrect['R']),
-        b = (self.trialsCount['L']+self.trialsCount['R']),
-        c=round(100*(self.trialsCorrect['L']+self.trialsCorrect['R'])/(self.trialsCount['L']+self.trialsCount['R']+0.0001)),
-        d = self.trialsCorrect['L'] ,
-        e = self.trialsCount['L'] ,
-        f = round(100*self.trialsCorrect['L']/(self.trialsCount['L']+0.0001)),
-        g = self.trialsCorrect['R'] ,
-        h = self.trialsCount['R'] ,
-        i = round(100*self.trialsCorrect['R']/(self.trialsCount['R']+0.0001)))
+    msg1 = 'Total trial: {a}/{b} = {c}% | Total time = {d} minutes {e} seconds'.format(d=int(tt/60),e=int(tt)%60,b = self.trialNum,a=self.trialCorrect,c=round(100*self.trialCorrect/self.trialNum))
     print (msg1)
-    print (msg2)
     logger.info(msg1)
-    logger.info(msg2)
 
   def run(self):
     ''' 
@@ -172,13 +149,12 @@ class BlockChoice (MazeProtocols):
               now = time.time()
               if now > (self.trialInit + self.rewardWindow):
                 logger.info('Not Giving reward, exceeding window')
-              elif self.currentTrial=='R':
+              elif self.trainingType == 'R':
                 logger.info('Not Giving reward, wrong side')
               else:
                 logger.info('Giving reward')
                 self.multiDrop('L')
-                self.trialsCorrect['L'] += 1
-                self.trials[-1][2] = 1
+                self.trialCorrect += 1
               self.printStats()
 
         elif self.state == 'reward left':
@@ -215,13 +191,12 @@ class BlockChoice (MazeProtocols):
               self.rewardDone = True
               if now > (self.trialInit + self.rewardWindow):
                 logger.info('NOT Giving reward, exceeding window')
-              elif self.currentTrial=='L':
+              elif self.trainingType=='L':
                 logger.info('Not Giving reward, wrong side')
               else:
                 logger.info('Giving reward')
                 self.multiDrop('R')
-                self.trialsCorrect['R'] += 1
-                self.trials[-1][2] = 1
+                self.trialCorrect += 1
               self.printStats()
 
         elif self.state == 'reward right':
