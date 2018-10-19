@@ -1,8 +1,8 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Arduino control for rat maze - V 1.1  2018/08/18
+// Arduino control for rat maze - V 1.2  2018/10/17
 ///////////////////////////////////////////////////////////////////////////////
 #define VERSIONMAY    1
-#define VERSIONMIN    0
+#define VERSIONMIN    2
 
 #include <Wire.h>  // Library which contains functions to have I2C Communication
 #define SLAVE_ADDRESS 0x60 // Define the I2C address to Communicate to Uno
@@ -42,9 +42,13 @@ enum COMMANDS {
   VALVE_CLOSE,              // second byte has valve number
   VALVE_DROP,               // second byte has valve number
   VALVE_MULTIDROP,          // second byte has valve number
-  VALVE_SET_MULTINUM,       // seconf byte has multidrop number
-  VALVE_SET_DELAYDROP,      // seconf byte has multidrop number
-  VALVE_SET_DELAYMULTIDROP, // seconf byte has multidrop number
+  VALVE_SET_MULTINUM,       // second byte has multidrop number
+  VALVE_SET_DELAYDROP,      // second byte has multidrop number
+  VALVE_SET_DELAYMULTIDROP, // second byte has multidrop number
+  HDMI_ON=16,               // second byte has pin number
+  HDMI_OFF,                 // second byte has pin number
+  IR_LED,                   // second byte set state
+  TRIAL=32,                 // second byte indicates trial type
   TEST1=90,                 // 0x5a 01011010
   TEST2=165                 // 0xa5 10100101
 };
@@ -96,6 +100,12 @@ const int powerButtonLed = 5;
 const int valveLeft = 14;    // A0
 const int valveRight = 15;   // A1
 
+const int hdmi2a = 11;
+const int hdmi2b = 10;
+const int hdmi1a = 13;
+const int hdmi1b = 12;
+
+const int irLed = 8;
 
 //*****************************************************************************
 // Prototypes
@@ -317,6 +327,26 @@ Serial.println(raspiState,DEC); //TODO DEBUG
           if ((bufferRX[1]>0) and (bufferRX[1]<101)) 
             delayMultiDrop = bufferRX[1]*500;
           break;
+        case IR_LED:  // delaydrop should be between 1 and 100
+          if (bufferRX[1]=='H') 
+            digitalWrite(irLed, HIGH);
+          else if (bufferRX[1]=='L')
+            digitalWrite(irLed, LOW);
+          break;
+        case TRIAL:  // delaydrop should be between 1 and 100
+          if (bufferRX[1]=='L')
+            digitalWrite(irLed, HIGH);
+            digitalWrite(hdmi1a, HIGH);
+            digitalWrite(hdmi1b, HIGH);
+            digitalWrite(hdmi2a, LOW);
+            digitalWrite(hdmi2b, LOW);
+          else if (bufferRX[1]=='R')
+            digitalWrite(irLed, HIGH);
+            digitalWrite(hdmi1a, LOW);
+            digitalWrite(hdmi1b, LOW);
+            digitalWrite(hdmi2a, HIGH);
+            digitalWrite(hdmi2b, HIGH);
+          break;
         case TEST1:
           // pulse one second arduino led
           digitalWrite(raspiArduinoLed, HIGH);
@@ -385,6 +415,18 @@ void setup() {
   digitalWrite(valveLeft, LOW);
   pinMode(valveRight, OUTPUT);
   digitalWrite(valveRight, LOW);
+
+  pinMode(hdmi1a, OUTPUT);
+  digitalWrite(hdmi1a, LOW);
+  pinMode(hdmi1b, OUTPUT);
+  digitalWrite(hdmi1b, LOW);
+  pinMode(hdmi2a, OUTPUT);
+  digitalWrite(hdmi2a, LOW);
+  pinMode(hdmi2b, OUTPUT);
+  digitalWrite(hdmi2b, LOW);
+
+  pinMode(irLed, OUTPUT);
+  digitalWrite(irLed, HIGH);
 
   //configure i2c
   Wire.begin(SLAVE_ADDRESS);   // this will begin I2C Connection with 0x40 address
