@@ -27,7 +27,7 @@ class MazeSyncOut(object):
 
   def setTrial(self,trialType):
     logger.debug('Trial sync {a}'.format(a=trialType))
-    self._device.write8(TRIAL,trialType)
+    self._device.write8(TRIAL,ord(trialType))
 
 if __name__ == '__main__':
   import sys,os

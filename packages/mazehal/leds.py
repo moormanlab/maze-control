@@ -27,11 +27,11 @@ class MazeLeds(object):
 
   def irOn(self):
     logger.debug('IrLED on')
-    self._device.write8(IR_LED,'H')
+    self._device.write8(IR_LED,ord('H'))
 
-  def irOff(self,key):
+  def irOff(self):
     logger.debug('IrLED off')
-    self._device.write8(IR_LED,'L')
+    self._device.write8(IR_LED,ord('L'))
 
 if __name__ == '__main__':
   import sys,os
