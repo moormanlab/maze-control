@@ -25,12 +25,12 @@ class MazeLeds(object):
     logger.debug('Leds initialized with id %s',id(self))
     logger.info('Leds version {a}'.format(a=LEDSVERSION))
 
-  def irOn(self,key):
-    logger.debug('Open valve {a}'.format(a=key))
+  def irOn(self):
+    logger.debug('IrLED on')
     self._device.write8(IR_LED,'H')
 
   def irOff(self,key):
-    logger.debug('Open valve {a}'.format(a=key))
+    logger.debug('IrLED off')
     self._device.write8(IR_LED,'L')
 
 if __name__ == '__main__':
@@ -45,13 +45,10 @@ if __name__ == '__main__':
   logging.basicConfig(filename=logfile,filemode='w+',level=logging.DEBUG,
           format=formatter_str, datefmt=dateformat)
 
-  logger.info('Valve Test')
+  logger.info('Leds Test')
 
-  valves=MazeValves()
-  valves.open('L')
+  leds=MazeLeds()
+  leds.irOn()
   time.sleep(1)
-  valves.close('L')
+  leds.irOff()
   time.sleep(1)
-  valves.open('R')
-  time.sleep(1)
-  valves.close('R')

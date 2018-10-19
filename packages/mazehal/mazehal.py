@@ -14,7 +14,8 @@ from mazehal.gates import MazeGates
 from mazehal.buttons import MazeButtons
 from mazehal.sensors import MazeSensors
 from mazehal.sounds import MazeSounds
-
+from mazehal.leds import MazeLeds
+from mazehal.syncout import MazeSyncOut
 
 class MazeHal(object):
   def __init__(self,buttonHandler=None,sensorHandler=None):
@@ -24,6 +25,8 @@ class MazeHal(object):
     self.buttons = MazeButtons(buttonHandler)
     self.sensors = MazeSensors(sensorHandler)
     self.sounds = MazeSounds()
+    self.leds = MazeLeds()
+    self.sync = MazeSyncOut()
     self.gates = MazeGates()
     self.gatesP=Process(target=self.gates.run)
 

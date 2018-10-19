@@ -118,7 +118,13 @@ class MazeProtocols(object):
   ## Sounds ##
 
   def playSound(self,key):
+    self._mazehal.leds.irOn()
     self._mazehal.sounds.play(key)
+    self._mazehal.leds.irOff()
+    if key=='1':
+        self._mazehal.sync.setTrial('L')
+    else:
+        self._mazehal.sync.setTrial('R')
 
   def addTone(self,key,duration=1.0, freq=1000.0, volume=1.0):
     self._mazehal.sounds.addTone(key=key,duration=duration,freq=freq,volume=volume)
