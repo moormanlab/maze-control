@@ -14,10 +14,6 @@ ARDUINO_ADDRESS  = 0x60
 #register
 IR_LED =        0x12
 
-leds = {'IR':['Left',ord('L')],
-          'R':['Right',ord('R')]
-          }
-
 class MazeLeds(object):
   def __init__(self, address=ARDUINO_ADDRESS, i2c=None, **kwargs):
     # Setup I2C interface for the device.
