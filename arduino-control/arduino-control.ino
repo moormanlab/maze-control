@@ -45,8 +45,8 @@ enum COMMANDS {
   VALVE_SET_MULTINUM,       // second byte has multidrop number
   VALVE_SET_DELAYDROP,      // second byte has multidrop number
   VALVE_SET_DELAYMULTIDROP, // second byte has multidrop number
-  HDMI_ON=16,               // second byte has pin number
-  HDMI_OFF,                 // second byte has pin number
+  HDMI_ON=16,               // second byte has pin number  0xXXXXABCD A:HDMI1 B:HDMI2 c:HDMI3 d:HDMI4
+  HDMI_OFF,                 // second byte has pin number  0xXXXXABCD A:HDMI1 B:HDMI2 c:HDMI3 d:HDMI4
   IR_LED,                   // second byte set state
   TRIAL=32,                 // second byte indicates trial type
   TEST1=90,                 // 0x5a 01011010
@@ -126,6 +126,7 @@ void SignalHaltRPI();
 volatile bool buttonSerial = false;
 char incomingByte;
 
+uint8_t tempcount=0;
 
 void loop() {
   // TODO DEBUG
@@ -284,10 +285,28 @@ Serial.println(raspiState,DEC); //TODO DEBUG
 
   if (newRPIPacket == true) {
     if (raspiState == SYS_RUNNING) {
+//digitalWrite(irLed, LOW);
       switch (bufferRX[0]) { // the first byte is the command 
         case RPI_KEEPALIVE:
 Serial.print("S:"); //TODO DEBUG
 Serial.println(raspiState,DEC); //TODO DEBUG
+//digitalWrite(hdmi1a, LOW);
+//digitalWrite(hdmi1b, LOW);
+//digitalWrite(hdmi2a, LOW);
+//digitalWrite(hdmi2b, LOW);
+//if (tempcount % 4 == 0) {
+//  digitalWrite(hdmi1a, HIGH);
+//  digitalWrite(irLed, HIGH);
+//}
+//else if (tempcount % 4 == 1)
+//  digitalWrite(hdmi1b, HIGH);
+//else if (tempcount % 4 == 2) {
+//  digitalWrite(hdmi2a, HIGH);
+//  digitalWrite(irLed, LOW);
+//}
+//else if (tempcount % 4 == 3)
+//  digitalWrite(hdmi2b, HIGH);
+//tempcount +=1;
           response = 'C'; 
           break;
         case RPI_HALTING:
@@ -328,24 +347,37 @@ Serial.println(raspiState,DEC); //TODO DEBUG
             delayMultiDrop = bufferRX[1]*500;
           break;
         case IR_LED:  // delaydrop should be between 1 and 100
-          if (bufferRX[1]=='H') 
+Serial.print("IR:"); //TODO DEBUG
+          if (bufferRX[1]=='H') {
+Serial.println("H"); //TODO DEBUG
             digitalWrite(irLed, HIGH);
-          else if (bufferRX[1]=='L')
+          }
+          else if (bufferRX[1]=='L') {
             digitalWrite(irLed, LOW);
+Serial.println("L"); //TODO DEBUG
+          }
           break;
         case TRIAL:  // delaydrop should be between 1 and 100
-          if (bufferRX[1]=='L')
-            digitalWrite(irLed, HIGH);
-            digitalWrite(hdmi1a, HIGH);
-            digitalWrite(hdmi1b, HIGH);
-            digitalWrite(hdmi2a, LOW);
-            digitalWrite(hdmi2b, LOW);
-          else if (bufferRX[1]=='R')
-            digitalWrite(irLed, HIGH);
-            digitalWrite(hdmi1a, LOW);
-            digitalWrite(hdmi1b, LOW);
-            digitalWrite(hdmi2a, HIGH);
-            digitalWrite(hdmi2b, HIGH);
+          break;
+        case HDMI_ON:
+          if (bufferRX[1]&0x08)
+            digitalWrite(hdmi1, HIGH);
+          if (bufferRX[1]&0x04)
+            digitalWrite(hdmi2, HIGH);
+          if (bufferRX[1]&0x02)
+            digitalWrite(hdmi3, HIGH);
+          if (bufferRX[1]&0x01)
+            digitalWrite(hdmi4, HIGH);
+          break;
+        case HDMI_OFF:
+          if (bufferRX[1]&0x08)
+            digitalWrite(hdmi1, LOW);
+          if (bufferRX[1]&0x04)
+            digitalWrite(hdmi2, LOW);
+          if (bufferRX[1]&0x02)
+            digitalWrite(hdmi3, LOW);
+          if (bufferRX[1]&0x01)
+            digitalWrite(hdmi4, LOW);
           break;
         case TEST1:
           // pulse one second arduino led
@@ -426,7 +458,7 @@ void setup() {
   digitalWrite(hdmi2b, LOW);
 
   pinMode(irLed, OUTPUT);
-  digitalWrite(irLed, HIGH);
+  digitalWrite(irLed, LOW);
 
   //configure i2c
   Wire.begin(SLAVE_ADDRESS);   // this will begin I2C Connection with 0x40 address
