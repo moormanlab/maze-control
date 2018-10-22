@@ -26,6 +26,7 @@ class MazeProtocols(object):
       buttonH = None
     self._mazehal = MazeHal(buttonHandler=buttonH,sensorHandler=sensorH)
     self._mazehal.init()
+    self._mazehal.sync.setLow([1,2,3,4,5,6,7,8])
     self.init()
     self.run()
    
@@ -77,9 +78,9 @@ class MazeProtocols(object):
     self._mazehal.sounds.play(key)
     self._mazehal.leds.irOff()
     if key=='1':
-        self._mazehal.sync.setHigh([1,2,5])
+        self._mazehal.sync.setHigh([1,5])
     else:
-        self._mazehal.sync.setHigh([1,3,6])
+        self._mazehal.sync.setHigh([2,6])
 
   def addTone(self,key,duration=1.0, freq=1000.0, volume=1.0):
     self._mazehal.sounds.addTone(key=key,duration=duration,freq=freq,volume=volume)
