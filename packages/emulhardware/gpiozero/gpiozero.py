@@ -88,8 +88,8 @@ class TrueButton(object):
       return self.button[pin].value
 
     def run(self):
-      try:
-        while True:
+      while True:
+        try:
           line = []
           with open(self.file) as f:
             fr = csv.reader(f)
@@ -100,13 +100,13 @@ class TrueButton(object):
               self.button[int(l[0])].value = False
             else:
               self.button[int(l[0])].value = True
-          time.sleep(.25)
-      except Exception as e:
+        except Exception as e:
           print('Exception in gpiozero module Truebutton')
           logger.error('Exception in gpiozero module Truebutton')
           logger.error(e)
-      finally:
-          print('se termino el principal')
+        #finally:
+          #print('se termino el principal')
+        time.sleep(.25)
 
   __instance = None
 
@@ -128,3 +128,15 @@ class TrueButton(object):
       """ Delegate access to implementation """
       return setattr(self.__instance, attr, value)
 
+
+
+class DigitalOutputDevice(object):
+    def __init__(self, pin=None, initial_value=False):
+        self.pin = pin
+        self.value = initial_value
+
+    def on(self):
+        self.value = True
+
+    def off(self):
+        self.value = False
