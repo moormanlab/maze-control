@@ -13,7 +13,6 @@ PROTOCOL_VERSION = '1.2'
 
 import numpy as np
 
-
 class BlockChoice (MazeProtocols):
   def init(self):
     # initialization
@@ -64,12 +63,11 @@ class BlockChoice (MazeProtocols):
 #
   def sensorHandler(self,sensor):
       ''' If you dont use a handler this function should be commented'''
-      print('sensor activated {a}'.format(a=sensor))
+      logger.info('sensor activated {a}'.format(a=sensor))
       self.myLastSensor = sensor
       pass
 
   # Write your own methods
-
   
   def chooseTone(self,trial):
     return int((trial-1)/self.blockSize) % 2 + 1
@@ -126,7 +124,8 @@ class BlockChoice (MazeProtocols):
       self.trialNum = 0
       # waiting to rat to pass the sensor
       #while self.getLastSensorActive()!='C':
-      while self.isSensorActive('C')==False:
+      while self.myLastSensor is not 'C':
+          time.sleep(.1)
           pass
       self.timeInitTraining = time.time()
       self.startTrial()
@@ -135,8 +134,8 @@ class BlockChoice (MazeProtocols):
         if self.state == 'start':
           self.rewardDone = False
 
-          #if self.myLastSensor=='UL':
-          if self.isSensorActive('UL')==True:
+          if self.myLastSensor=='UL':
+          #if self.isSensorActive('UL')==True:
             logger.info('Rat at {a}'.format(a='UL'))
             #the rat went left
             self.closeGateFast('IBL')
@@ -145,8 +144,8 @@ class BlockChoice (MazeProtocols):
             self.openGateFast('OBL')
             self.state='going left'
             logger.info('reward on left')
-          #elif self.myLastSensor=='UR':
-          elif self.isSensorActive('UR')==True:
+          elif self.myLastSensor=='UR':
+          #elif self.isSensorActive('UR')==True:
             logger.info('Rat at {a}'.format(a='UR'))
             #the rat went right
             self.closeGateFast('IBL')
@@ -158,8 +157,7 @@ class BlockChoice (MazeProtocols):
             logger.info('reward on right')
 
         elif self.state == 'going left':
-          #if self.myLastSensor=='L':
-          if self.isSensorActive('L')==True:
+          if self.myLastSensor=='L':
             logger.info('Rat at {a}'.format(a='L'))
             self.closeGateFast('IUL')
             self.openGateFast('IBL')
@@ -179,19 +177,14 @@ class BlockChoice (MazeProtocols):
               self.printStats()
 
         elif self.state == 'reward left':
-          #if self.myLastSensor=='BL':
-          if self.isSensorActive('BL')==True:
+          if self.myLastSensor=='BL':
             logger.info('Rat at {a}'.format(a='BL'))
             self.closeGateFast('OUL')
             self.state = 'returning left'
 
-          #if self.myLastSensor=='L':
-          if self.isSensorActive('L')==True:
-            logger.info('Rat at {a}'.format(a='L'))
 
         elif self.state == 'returning left':
-          #if self.myLastSensor=='C':
-          if self.isSensorActive('C')==True:
+          if self.myLastSensor=='C':
             logger.info('Rat at {a}'.format(a='C'))
             self.closeGateFast('OBL')
             self.openGateFast('OUL')
@@ -201,8 +194,7 @@ class BlockChoice (MazeProtocols):
 
 
         elif self.state == 'going right':
-          #if self.getLastSensorActive()=='R':
-          if self.isSensorActive('R')==True:
+          if self.myLastSensor=='R':
             logger.info('Rat at {a}'.format(a='R'))
             self.closeGateFast('IUR')
             self.openGateFast('IBR')
@@ -222,20 +214,13 @@ class BlockChoice (MazeProtocols):
               self.printStats()
 
         elif self.state == 'reward right':
-          #if self.getLastSensorActive()=='BR':
-          if self.isSensorActive('BR')==True:
+          if self.myLastSensor=='BR':
             logger.info('Rat at {a}'.format(a='BR'))
             self.closeGateFast('OUR')
-
             self.state = 'returning right'
-
-          #if self.getLastSensorActive()=='R':
-          if self.isSensorActive('R')==True:
-            logger.info('Rat at {a}'.format(a='R'))
                 
         elif self.state == 'returning right':
-          #if self.getLastSensorActive()=='C':
-          if self.isSensorActive('C')==True:
+          if self.myLastSensor=='C':
             logger.info('Rat at {a}'.format(a='C'))
             self.closeGateFast('OBR')
             self.openGateFast('OUL')

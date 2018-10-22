@@ -63,14 +63,13 @@ class Maze(object):
 
 
     self.protocol = Protokol()
-    self.protocol.init()
-    self.protocolP = Process(target=self.protocol.run)
     #protocolP.daemon = True
     #self.keyboardP = Process(target=self.keyboardCap)
     #self.keyboardP.daemon=True
 
   def start(self):
       #self.keyboardP.start()
+      self.protocolP = Process(target=self.protocol._run)
       self.protocolP.start()
       self.run()
   
@@ -89,7 +88,6 @@ class Maze(object):
       fcntl.fcntl(fd, fcntl.F_SETFL, oldflags | os.O_NONBLOCK)
       printhelp()
       try:
-#
         while True:
           time.sleep(.2)
           c = sys.stdin.read(1)
@@ -140,18 +138,12 @@ class Maze(object):
               print ('exiting')
               self.exit()
 
-#              break
-#      except IOError:
-#        print ('error capturing HEERERERERE')
-#        logger.error('error capturing HEERERERERE')
       except Exception as e:
           logger.error('#################################')
           logger.error(e)
           logger.error('#################################')
-          #termios.tcsetattr(fd, termios.TCSAFLUSH, oldterm)
-          #fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
       finally:
-          print ('#####FINALYY#######')
+          print ('#####Program ended#######')
           termios.tcsetattr(fd, termios.TCSAFLUSH, oldterm)
           fcntl.fcntl(fd, fcntl.F_SETFL, oldflags)
 
@@ -165,14 +157,8 @@ class Maze(object):
     logger.warning('pausing')
 
   def exit(self):
-    logger.warning('exiting')
-    #self.halP.terminate()
-    print('first')
+    logger.warning('Exiting')
     self.protocolP.terminate()
-    #self.protocolP.join()
-    #self.keyboardP.terminate()
-    #time.sleep(.5)
-    print('second')
     sys.exit()
       
 if __name__ == '__main__':
@@ -205,7 +191,6 @@ if __name__ == '__main__':
   
   try:
     maze.start()
-    print('im here')
 
   except Exception as inst:
     print ('Exception ocurred')

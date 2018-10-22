@@ -5,15 +5,14 @@ SENSORVERSION = 1.3
 
 import time
 
+import traceback
 import logging
 logger=logging.getLogger(__name__)
 
 import gpiozero
-#import modules.gpiozero as gpiozero
-
 
 #        /---------------\   /---------------\
-#       /        UL(18)   \-/       UR(23)    \
+#       /      UL(18)     \-/     UR(23)      \
 #      /   /------------\     /------------\   \
 #     |   /              \   /              \   |
 #     |   |              |   |              |   |
@@ -21,7 +20,7 @@ import gpiozero
 #     |   |              |   |              |   |
 #     |   \              /   \              /   |
 #      \   \------------/     \------------/   /
-#       \        BL(4)    /-\       BR(24)    /
+#       \       BL(4)     /-\     BR(24)      /
 #        \---------------/   \---------------/
 
 
@@ -33,6 +32,8 @@ sensors = {'UL':18,
            'C':27,
            'R':22
            }
+
+import os
 
 class Sensor(object):
   def __init__(self,gpioN=0):
@@ -57,6 +58,7 @@ class MazeSensors(object):
 
     logger.debug('MazeSensors id %s ',id(self))
     logger.info('Sensors version {a}'.format(a=SENSORVERSION))
+    logger.debug('Using handler {a}'.format(a=handler))
 
   def _sensorsHandler(self,sensorObj):
     try:
@@ -66,13 +68,11 @@ class MazeSensors(object):
           if value == sensorPin:
               sensorName = key
       logger.debug('Sensor activated {a}'.format(a=sensorName))
-      logger.debug('Last sensor was {a}'.format(a=self.lastSensorActive))
       self.lastSensorActive = sensorName
       if self.handler is not None:
         self.handler(sensorName)
     except Exception as e:
-      logger.error(e)
-      logger.error(str(e))
+      logger.error(traceback.format_exc())
       print('error handled module sensor')
 
   def isPressed(self,key):
@@ -95,16 +95,45 @@ if __name__ == '__main__':
           format=formatter_str, datefmt=dateformat)
 
   logger.info('Sensors test')
+  lastactive = None
 
-  def anotherHandler(obj):
-    for key in obj.sensor:
-      if obj.isPressed(key):
-        print(key)
-    logger.info(obj.sensor)
+  class Test(object):
+    def __init__(self):
+      self.lastactive = None
+      logger.debug('Tests id %s ',id(self))
+      logger.debug('property id %s',id(self.lastactive))
+      logger.info('Using handler {a}'.format(a=self.anotherHandler))
+      logger.debug('procces id {}'.format(os.getpid()))
+      self.sn = None
+      logger.debug('MazeSensors id %s ',id(self.sn))
 
-  logger.info(id(anotherHandler))
-  sn = MazeSensors(anotherHandler)
-  logger.info(id(sn))
 
-  while True:
-    time.sleep(2)
+    def anotherHandler(self,sensor):
+      print('last {a}'.format(a=self.lastactive))
+      print('now {a}'.format(a=sensor))
+      self.lastactive=sensor
+      logger.debug('Tests id %s ',id(self))
+      logger.debug('property id %s',id(self.lastactive))
+      logger.debug('procces id {}'.format(os.getpid()))
+      logger.info(sensor)
+
+    def run(self):
+      self.sn = MazeSensors(self.anotherHandler)
+      while True:
+        time.sleep(2)
+        print(self.sn.getLastSensorActive())
+        print(self.lastactive)
+        print('procces id {}'.format(os.getpid()))
+
+
+  test = Test()
+
+#  while True:
+#    time.sleep(2)
+#    print(test.sn.getLastSensorActive())
+#    print(test.lastactive)
+
+  from multiprocessing import Process
+  p = Process(target=test.run)
+  p.start()
+

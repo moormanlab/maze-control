@@ -14,6 +14,7 @@ class MazeProtocols(object):
     signal.signal(signal.SIGTERM, self.__exit_gracefully)  
     logger.info('Maze Protocols version {a}'.format(a=PROTOCOLSVERSION))
 
+  def _run(self):
     if 'sensorHandler' in dir(self):
       sensorH = self.sensorHandler
     else:
@@ -25,17 +26,14 @@ class MazeProtocols(object):
       buttonH = None
     self._mazehal = MazeHal(buttonHandler=buttonH,sensorHandler=sensorH)
     self._mazehal.init()
+    self.init()
+    self.run()
    
-#  def __del__(self):
-#    print('hhhhe')
-#    logger.debug(dir(self))
-#    logger.debug(id(self))
-#    self.exit()
-
   def __exit_gracefully(self,a,b):
-    print('exiting mazeprotocol')
+    print('Exiting MazeProtocol')
     self.exit()
     self._mazehal.exit()
+    sys.exit()
 
   ## Buttons ##
 
@@ -43,40 +41,12 @@ class MazeProtocols(object):
 
   def getLastSensorActive(self):
     return self._mazehal.sensors.getLastSensorActive()
-#    self.qC.put(['sensor','last'])
-#    while self.qR.empty():
-#      time.sleep(0.01)
-#    a = self.qR.get()
-#    if a[0]=='sensor':
-#      return a[1]
-#    else:
-#      raise NameError('Unespected error')
 
   def isSensorActive(self,key):
     return self._mazehal.sensors.isPressed(key)
-#    self.qC.put(['sensor',key])
-#    while self.qR.empty():
-#      time.sleep(.01)
-#    a = self.qR.get()
-#    if a[0]=='sensor':
-#      return a[1]
-#    else:
-#      raise NameError('Unespected error')
 
   ## Valves ####
 
-#                    if msg[1] == 'drop':
-#                    elif msg[1] == 'multidrop':
-#                    elif msg[1]=='open':
-#                        self.valves.open(msg[2])
-#                    elif msg[1]=='close':
-#                        self.valves.close(msg[2])
-#                    elif msg[1]=='sdd':
-#                        self.valves.setDropDelay(msg[2])
-#                    elif msg[1]=='smd':
-#                        self.valves.setMultidropsNum(msg[2])
-#                    elif msg[1]=='smdd':
-#                        self.valves.setMultidropsDelay(msg[2])
   def drop(self,key):
     self._mazehal.valves.drop(key)
 
@@ -88,18 +58,6 @@ class MazeProtocols(object):
 
   ## Gates ##
 
-#                    if msg[1] == 'openAllNow':
-#                        self.gates.openAllFast()
-#                    elif msg[1] == 'openAll':
-#                        self.gates.openAll()
-#                    elif msg[1] == 'open':
-#                        self.gates.openGate(msg[2])
-#                    elif msg[1] == 'close':
-#                        self.gates.closeGate(msg[2])
-#                    elif msg[1] == 'openF':
-#                        self.gates.openGateFast(msg[2])
-#                    elif msg[1] == 'closeF':
-#                        self.gates.closeGateFast(msg[2])
   def openGate(self,key):
     self._mazehal.gates.openGate(key)
 
