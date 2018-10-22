@@ -169,7 +169,7 @@ class Maze(object):
     #self.halP.terminate()
     print('first')
     self.protocolP.terminate()
-    self.protocolP.join()
+    #self.protocolP.join()
     #self.keyboardP.terminate()
     #time.sleep(.5)
     print('second')
