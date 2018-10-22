@@ -62,14 +62,11 @@ class BlockChoice (MazeProtocols):
 #      ''' If you dont use a handler this function should be commented'''
 #      pass
 #
-#  def sensorHandler(self,sensor):
-#      ''' If you dont use a handler this function should be commented'''
-#      print('sensor activated {a}'.format(a=sensor))
-#      print(id(self))
-#      print(dir(self))
-#      self.trialNum +=1
-#      self.myLastSensor = sensor
-#      pass
+  def sensorHandler(self,sensor):
+      ''' If you dont use a handler this function should be commented'''
+      print('sensor activated {a}'.format(a=sensor))
+      self.myLastSensor = sensor
+      pass
 
   # Write your own methods
 

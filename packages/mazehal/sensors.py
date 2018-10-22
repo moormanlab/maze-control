@@ -1,7 +1,7 @@
 # Sensors control for maze
 # Author: Ariel Burman
 
-SENSORVERSION = 1.2
+SENSORVERSION = 1.3
 
 import time
 

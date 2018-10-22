@@ -3,6 +3,7 @@
 from multiprocessing import Process,Value,Lock
 from ctypes import c_bool,c_int
 import time
+import signal
 
 import logging
 logger=logging.getLogger(__name__)
@@ -13,6 +14,7 @@ filename = './buttons.txt'
 class Button(object):
     def __init__(self, pin=None, pull_up=True, bounce_time=None,hold_time=1, 
             hold_repeat=False):
+        #signal.signal(signal.SIGTERM, self.__exit_gracefully)  
         self.pin =pin
         self.pinname = self.ButtonName('GPIO'+str(pin))
         self.hold_time = hold_time
@@ -39,7 +41,7 @@ class Button(object):
         self.p.start()
 
     def run(self):
-      try:
+      #try:
         while True:
           a = self.t.buttonPress(self.pin)
           if self._is_pressed.value != a:
@@ -49,12 +51,12 @@ class Button(object):
               logger.debug('calling handler {a} with id {b} name {c}'.format(a=self.when_pressed,b=id(self.when_pressed),c=str(self.when_pressed)))
               self.when_pressed(self.pinname)
           time.sleep(.05)
-      except Exception as e:
-          print('hubo excepcion')
-          logger.error('Exception in gpiozero module')
-          logger.error(e)
-      finally:
-          print('se termino')
+      #except Exception as e:
+#          print('Exception in gpiozero Button module')
+#          logger.error('Exception in gpiozero Button module')
+#          logger.error(e)
+      #finally:
+#          logger.warning('ending gpiozero emul')
 
     # inner class only for the name
     class ButtonName(object):
@@ -68,6 +70,7 @@ class TrueButton(object):
   class __impl:
     def __init__(self):
       self.file = filename
+      #signal.signal(signal.SIGTERM, self.__exit_gracefully)  
       self.p = Process(target=self.run)
       self.button = {12:Value(c_bool,False), #button
                      13:Value(c_bool,False), #button
@@ -82,6 +85,7 @@ class TrueButton(object):
                      22:Value(c_bool,False)  #sensor
                      }
       self.p.daemon = True
+      print("iniciando truebutton daemon")
       self.p.start()
       
     def buttonPress(self,pin):
@@ -91,7 +95,7 @@ class TrueButton(object):
       while True:
         try:
           line = []
-          with open(self.file) as f:
+          with open(self.file,'r') as f:
             fr = csv.reader(f)
             for row in fr:
               line.append(row)
@@ -109,6 +113,7 @@ class TrueButton(object):
         time.sleep(.25)
 
   __instance = None
+  __num = 0
 
   def __init__(self):
       """ Create singleton instance """
@@ -116,9 +121,10 @@ class TrueButton(object):
       if TrueButton.__instance is None:
           # Create and remember instance
           TrueButton.__instance = TrueButton.__impl()
-
       # Store instance reference as the only member in the handle
       #self.__dict__['_Singleton__instance'] = Singleton.__instance
+      TrueButton.__num +=1
+      print('Trubutton num = {a}'.format(a=TrueButton.__num))
 
   def __getattr__(self, attr):
       """ Delegate access to implementation """
@@ -128,6 +134,9 @@ class TrueButton(object):
       """ Delegate access to implementation """
       return setattr(self.__instance, attr, value)
 
+  def __del__(self):
+      TrueButton.__num -=1
+      print("deleting trubutton. {a} remaining".format(a=TrueButton.__num))
 
 
 class DigitalOutputDevice(object):

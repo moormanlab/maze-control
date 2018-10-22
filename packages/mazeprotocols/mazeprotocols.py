@@ -13,16 +13,14 @@ class MazeProtocols(object):
   def __init__(self):
     signal.signal(signal.SIGTERM, self.__exit_gracefully)  
     logger.info('Maze Protocols version {a}'.format(a=PROTOCOLSVERSION))
-    #self.qC = queueCommands
-    #self.qR = queueResponses
 
     if 'sensorHandler' in dir(self):
-      sensorH = self.protocol.sensorHandler
+      sensorH = self.sensorHandler
     else:
       sensorH = None
 
     if 'buttonHandler' in dir(self):
-      buttonH = self.protocol.buttonHandler
+      buttonH = self.buttonHandler
     else:
       buttonH = None
     self._mazehal = MazeHal(buttonHandler=buttonH,sensorHandler=sensorH)
@@ -38,7 +36,6 @@ class MazeProtocols(object):
     print('exiting mazeprotocol')
     self.exit()
     self._mazehal.exit()
-    #sys.exit()
 
   ## Buttons ##
 
