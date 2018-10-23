@@ -26,13 +26,22 @@ class MazeProtocols(object):
       buttonH = None
     self._mazehal = MazeHal(buttonHandler=buttonH,sensorHandler=sensorH)
     self._mazehal.init()
-    self._mazehal.sync.setLow([1,2,3,4,5,6,7,8])
+    self._mazehal.sync.setHigh([1,2,3,4,5,6,7,8])
+    self._mazehal.sync.setLow([1])
+    self._mazehal.sync.setLow([2])
+    self._mazehal.sync.setLow([3])
+    self._mazehal.sync.setLow([4])
+    self._mazehal.sync.setLow([5])
+    self._mazehal.sync.setLow([6])
+    self._mazehal.sync.setLow([7])
+    self._mazehal.sync.setLow([8])
     self.init()
     self.run()
    
   def __exit_gracefully(self,a,b):
     print('Exiting MazeProtocol')
     self.exit()
+    self._mazehal.sync.setLow([1,2,3,4,5,6,7,8])
     self._mazehal.exit()
     sys.exit()
 
@@ -74,13 +83,20 @@ class MazeProtocols(object):
   ## Sounds ##
 
   def playSound(self,key):
+    self._mazehal.sync.setHigh([1])
     self._mazehal.leds.irOn()
     self._mazehal.sounds.play(key)
     self._mazehal.leds.irOff()
-    if key=='1':
-        self._mazehal.sync.setHigh([1,5])
+    self._mazehal.sync.setLow([1])
+    if key==1:
+        self._mazehal.sync.setHigh([2,7])
+        time.sleep(.05)
+        self._mazehal.sync.setLow([2,7])
     else:
-        self._mazehal.sync.setHigh([2,6])
+        self._mazehal.sync.setHigh([3,8])
+        time.sleep(.05)
+        self._mazehal.sync.setLow([3,8])
+
 
   def addTone(self,key,duration=1.0, freq=1000.0, volume=1.0):
     self._mazehal.sounds.addTone(key=key,duration=duration,freq=freq,volume=volume)
