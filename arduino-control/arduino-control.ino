@@ -100,10 +100,10 @@ const int powerButtonLed = 5;
 const int valveLeft = 14;    // A0
 const int valveRight = 15;   // A1
 
-const int hdmi2a = 11;
-const int hdmi2b = 10;
-const int hdmi1a = 13;
-const int hdmi1b = 12;
+const int hdmi1 = 11;  //hdmi 2a
+const int hdmi2 = 10;  //hdmi 2b
+const int hdmi3 = 12;  //hdmi 1a
+const int hdmi4 = 13;  //hdmi 1b
 
 const int irLed = 8;
 
@@ -360,23 +360,23 @@ Serial.println("L"); //TODO DEBUG
         case TRIAL:  // delaydrop should be between 1 and 100
           break;
         case HDMI_ON:
-          if (bufferRX[1]&0x08)
-            digitalWrite(hdmi1, HIGH);
-          if (bufferRX[1]&0x04)
-            digitalWrite(hdmi2, HIGH);
-          if (bufferRX[1]&0x02)
-            digitalWrite(hdmi3, HIGH);
           if (bufferRX[1]&0x01)
+            digitalWrite(hdmi1, HIGH);
+          if (bufferRX[1]&0x02)
+            digitalWrite(hdmi2, HIGH);
+          if (bufferRX[1]&0x04)
+            digitalWrite(hdmi3, HIGH);
+          if (bufferRX[1]&0x08)
             digitalWrite(hdmi4, HIGH);
           break;
         case HDMI_OFF:
-          if (bufferRX[1]&0x08)
-            digitalWrite(hdmi1, LOW);
-          if (bufferRX[1]&0x04)
-            digitalWrite(hdmi2, LOW);
-          if (bufferRX[1]&0x02)
-            digitalWrite(hdmi3, LOW);
           if (bufferRX[1]&0x01)
+            digitalWrite(hdmi1, LOW);
+          if (bufferRX[1]&0x02)
+            digitalWrite(hdmi2, LOW);
+          if (bufferRX[1]&0x04)
+            digitalWrite(hdmi3, LOW);
+          if (bufferRX[1]&0x08)
             digitalWrite(hdmi4, LOW);
           break;
         case TEST1:
@@ -448,14 +448,14 @@ void setup() {
   pinMode(valveRight, OUTPUT);
   digitalWrite(valveRight, LOW);
 
-  pinMode(hdmi1a, OUTPUT);
-  digitalWrite(hdmi1a, LOW);
-  pinMode(hdmi1b, OUTPUT);
-  digitalWrite(hdmi1b, LOW);
-  pinMode(hdmi2a, OUTPUT);
-  digitalWrite(hdmi2a, LOW);
-  pinMode(hdmi2b, OUTPUT);
-  digitalWrite(hdmi2b, LOW);
+  pinMode(hdmi1, OUTPUT);
+  digitalWrite(hdmi1, LOW);
+  pinMode(hdmi2, OUTPUT);
+  digitalWrite(hdmi2, LOW);
+  pinMode(hdmi3, OUTPUT);
+  digitalWrite(hdmi3, LOW);
+  pinMode(hdmi4, OUTPUT);
+  digitalWrite(hdmi4, LOW);
 
   pinMode(irLed, OUTPUT);
   digitalWrite(irLed, LOW);
