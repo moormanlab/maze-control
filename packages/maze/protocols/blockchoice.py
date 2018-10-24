@@ -84,9 +84,21 @@ class BlockChoice (MazeProtocols):
         self.currentTrial = 'R'
         
     self.trials.append([self.trialNum, self.currentTrial,0])
+    self.setSyncH([1,'IR'])
     self.playSound(nextTone)
-    logger.info('Played tone {a} trialNum {b}'.format(a=nextTone,b=self.trialNum))
     self.trialInit = time.time()
+    time.sleep(.05)
+    self.setSyncL([1,'IR'])
+    if nextTone==1:
+      self.setSyncH([2,7])
+      time.sleep(.05)
+      self.setSyncL([2,7])
+    else:
+      self.setSyncH([3,8])
+      time.sleep(.05)
+      self.setSyncL([3,8])
+
+    logger.info('Played tone {a} trialNum {b}'.format(a=nextTone,b=self.trialNum))
     self.trialsCount[self.currentTrial] +=1
     time.sleep(1.2)
     if (self.trialNum % 2):

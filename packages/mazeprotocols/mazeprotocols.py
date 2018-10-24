@@ -101,3 +101,58 @@ class MazeProtocols(object):
   def addTone(self,key,duration=1.0, freq=1000.0, volume=1.0):
     self._mazehal.sounds.addTone(key=key,duration=duration,freq=freq,volume=volume)
 
+
+  ## Sync ##
+
+  def setSyncH(self,data):
+    if type(data) is int:
+      if data >=0 and data<=8:
+        self._mazehal.sync.setHigh([data])
+      else:
+        raise ValueError('Bad sync output number')
+    elif type(data) is str:
+      if data=='IR':
+        self._mazehal.leds.irOn()
+      else:
+        raise ValueError('Bad sync output number')
+    elif type(data) is list:
+      data2 = []
+      for i in data:
+        if type(i) is str:
+          if i == 'IR':
+            self._mazehal.leds.irOn()
+          else:
+            raise ValueError('Bad sync output number')
+        else:
+          if i >=0 and i <=8:
+            data2.append(i)
+          else:
+            raise ValueError('Bad sync output number')
+      self._mazehal.sync.setHigh(data2)
+
+  def setSyncL(self,data):
+    if type(data) is int:
+      if data >=0 and data<=8:
+        self._mazehal.sync.setLow([data])
+      else:
+        raise ValueError('Bad sync output number')
+    elif type(data) is str:
+      if data=='IR':
+        self._mazehal.leds.irOff()
+      else:
+        raise ValueError('Bad sync output number')
+    elif type(data) is list:
+      data2 = []
+      for i in data:
+        if type(i) is str:
+          if i == 'IR':
+            self._mazehal.leds.irOff()
+          else:
+            raise ValueError('Bad sync output number')
+        else:
+          if i >=0 and i <=8:
+            data2.append(i)
+          else:
+            raise ValueError('Bad sync output number')
+      self._mazehal.sync.setLow(data2)
+

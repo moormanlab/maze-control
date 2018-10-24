@@ -7,7 +7,7 @@ MAZEVERSION = 1.1
 import logging
 import time
 import importlib
-from importlib import util as imputil
+#from importlib import util as imputil
 from multiprocessing import Process, Queue
 
 from mazeprotocols import MazeProtocols
@@ -21,7 +21,7 @@ def check_module(module_name):
   """
   logger.debug(module_name)
   logger.debug(dir(importlib))
-  module_spec = imputil.find_spec(module_name)
+  module_spec = importlib.util.find_spec(module_name)
   if module_spec is None:
       logger.info('Module: {} not found'.format(module_name))
       return None
