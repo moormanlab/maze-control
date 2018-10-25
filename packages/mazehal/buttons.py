@@ -1,10 +1,11 @@
 # Button control for maze
 # Author: Ariel Burman
 
-BUTTONSVERSION = 1.1
+BUTTONSVERSION = 1.2
 
 import time
 
+import traceback
 import logging
 logger=logging.getLogger(__name__)
 
@@ -21,7 +22,7 @@ buttons = {'B':[12,15,'blue'],
 class ledButton(object):
   def __init__(self,gpioN=0,ledN=0,color=''):
     logger.info('Button connected to gpio %s with led %s is color %s id %s ',gpioN,ledN,color,id(self))
-    self.button=gpiozero.Button(gpioN,pull_up=True,bounce_time=0.2,hold_time=0.4,hold_repeat=False)
+    self.button=gpiozero.Button(gpioN,pull_up=True,bounce_time=0.1,hold_time=1,hold_repeat=False)
     self.button.when_pressed = None
     self.ledN=ledN
     self.pwm = pwm.AdaI2C()
@@ -68,12 +69,12 @@ class MazeButtons(object):
       for key,value in buttons.items():
           if buttonPin == value[0]:
               buttonName = key
+      logger.debug('Button activated {a}'.format(a=buttonName))
+      self.lastSensorActive = buttonName
       if self.handler is not None:
-        self.handler(self,buttonName)
-      else:
-        logger.debug('button pressed {a}'.format(a=buttonName))
+        self.handler(buttonName)
     except Exception as e:
-      logger.error(e)
+      logger.error(traceback.format_exc())
       print('error handled in button module')
 
   def setLedOn(self,key):
@@ -104,39 +105,76 @@ if __name__ == '__main__':
           format=formatter_str, datefmt=dateformat)
 
   logger.info('Buttons test')
-  bt = MazeButtons()
 
-  while True:
-      msg = ''
-      for i in bt.button:
-          msg = msg + str(i) + '=' + str(bt.isPressed(i)) + '|'
-      logger.info(msg)
-      print(msg)
-      time.sleep(2)
-      for i in range(20):
-        bt.setLedPwm('B',i/19)
-        time.sleep(.05)
-      for i in range(20):
-        bt.setLedPwm('B',1-i/19)
-        bt.setLedPwm('Y',i/19)
-        time.sleep(.05)
-      for i in range(20):
-        bt.setLedPwm('Y',1-i/19)
-        bt.setLedPwm('W',i/19)
-        time.sleep(.05)
-      for i in range(20):
-        bt.setLedPwm('W',1-i/19)
-        bt.setLedPwm('G',i/19)
-        time.sleep(.05)
-      for i in range(20):
-        bt.setLedPwm('G',1-i/19)
-        time.sleep(.05)
-      bt.setLedOn('B')
-      bt.setLedOn('Y')
-      bt.setLedOn('W')
-      bt.setLedOn('G')
-      time.sleep(.5)
-      bt.setLedOff('B')
-      bt.setLedOff('Y')
-      bt.setLedOff('W')
-      bt.setLedOff('G')
+  class Test(object):
+    def __init__(self):
+      self.lastactive = None
+      logger.debug('Tests id %s ',id(self))
+      logger.debug('property id %s',id(self.lastactive))
+      logger.info('Using handler {a}'.format(a=self.anotherHandler))
+      logger.debug('procces id {}'.format(os.getpid()))
+      self.bt = None
+      logger.debug('MazeButtons id %s ',id(self.bt))
+
+
+    def anotherHandler(self,button):
+      print('last {a}'.format(a=self.lastactive))
+      print('now {a}'.format(a=button))
+      self.lastactive=button
+      self.bt.setLedOn(button)
+      logger.debug('Tests id %s ',id(self))
+      logger.debug('property id %s',id(self.lastactive))
+      logger.debug('procces id {}'.format(os.getpid()))
+      logger.info(button)
+
+    def run(self):
+      self.bt = MazeButtons(self.anotherHandler)
+      while True:
+        time.sleep(3)
+        print('restarting')
+        self.bt.setLedOff('B')
+        self.bt.setLedOff('Y')
+        self.bt.setLedOff('W')
+        self.bt.setLedOff('G')
+
+
+  test = Test()
+
+  from multiprocessing import Process
+  p = Process(target=test.run)
+  p.start()
+
+#  while True:
+#      msg = ''
+#      for i in bt.button:
+#          msg = msg + str(i) + '=' + str(bt.isPressed(i)) + '|'
+#      logger.info(msg)
+#      print(msg)
+#      time.sleep(2)
+#      for i in range(20):
+#        bt.setLedPwm('B',i/19)
+#        time.sleep(.05)
+#      for i in range(20):
+#        bt.setLedPwm('B',1-i/19)
+#        bt.setLedPwm('Y',i/19)
+#        time.sleep(.05)
+#      for i in range(20):
+#        bt.setLedPwm('Y',1-i/19)
+#        bt.setLedPwm('W',i/19)
+#        time.sleep(.05)
+#      for i in range(20):
+#        bt.setLedPwm('W',1-i/19)
+#        bt.setLedPwm('G',i/19)
+#        time.sleep(.05)
+#      for i in range(20):
+#        bt.setLedPwm('G',1-i/19)
+#        time.sleep(.05)
+#      bt.setLedOn('B')
+#      bt.setLedOn('Y')
+#      bt.setLedOn('W')
+#      bt.setLedOn('G')
+#      time.sleep(.5)
+#      bt.setLedOff('B')
+#      bt.setLedOff('Y')
+#      bt.setLedOff('W')
+#      bt.setLedOff('G')

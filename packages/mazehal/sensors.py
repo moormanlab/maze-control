@@ -1,7 +1,7 @@
 # Sensors control for maze
 # Author: Ariel Burman
 
-SENSORVERSION = 1.3
+SENSORVERSION = 1.4
 
 import time
 
@@ -62,7 +62,7 @@ class MazeSensors(object):
 
   def _sensorsHandler(self,sensorObj):
     try:
-      logger.info(sensorObj.pin)
+      logger.debug(sensorObj.pin)
       sensorPin = int(str(sensorObj.pin)[4:])
       for key,value in sensors.items():
           if value == sensorPin:

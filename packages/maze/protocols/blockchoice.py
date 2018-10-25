@@ -9,7 +9,7 @@ import logging
 logger=logging.getLogger(__name__)
 
 PROTOCOL_NAME= 'BlockChoice'
-PROTOCOL_VERSION = '1.2'
+PROTOCOL_VERSION = '1.3'
 
 import numpy as np
 
@@ -57,10 +57,11 @@ class BlockChoice (MazeProtocols):
     print('bye bye')
     pass # leave this line in case 'exit' is empty
 
-#  def buttonHandler(obj,button):
-#      ''' If you dont use a handler this function should be commented'''
-#      pass
-#
+  def buttonHandler(obj,button):
+      ''' If you dont use a handler this function should be commented'''
+      print('button pressed {a}'.format(a=button))
+      pass
+
   def sensorHandler(self,sensor):
       ''' If you dont use a handler this function should be commented'''
       logger.info('sensor activated {a}'.format(a=sensor))
@@ -84,6 +85,7 @@ class BlockChoice (MazeProtocols):
         self.currentTrial = 'R'
         
     self.trials.append([self.trialNum, self.currentTrial,0])
+    self.setSyncTrial()
     self.setSyncH([1,'IR'])
     self.playSound(nextTone)
     self.trialInit = time.time()

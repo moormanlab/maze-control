@@ -1,7 +1,7 @@
 # Leds control for maze
 # Author: Ariel Burman
 
-SYNCVERSION     = 1.0
+SYNCVERSION     = 1.1
 
 import time
 import gpiozero
@@ -13,7 +13,9 @@ logger = logging.getLogger(__name__)
 ARDUINO_ADDRESS  = 0x60
 
 #register
-TRIAL      = 0x20
+TRAINSTART = 0x20
+TRAINEND   = 0x21
+TRIALSTART = 0x22
 HDMI_ON    = 0x10
 HDMI_OFF   = 0x11
 
@@ -95,6 +97,19 @@ class MazeSyncOut(object):
         if i in self.syncOut:
           logger.debug('Syncout Low {a}'.format(a=i))
           self.syncOut[i].setLow()
+
+  def startTraining(self):
+    logger.debug('Sending Start Training')
+    self._device.writeRaw8(TRAINSTART)
+
+  def endTraining(self):
+    logger.debug('Sending End Training')
+    self._device.writeRaw8(TRAINEND)
+
+  def startTrial(self):
+    logger.debug('Sending start Trial')
+    self._device.writeRaw8(TRIALSTART)
+
 
 if __name__ == '__main__':
   import sys,os

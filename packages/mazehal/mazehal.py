@@ -1,7 +1,7 @@
 # Hardaware abstraction layer for maze
 # Author: Ariel Burman
 
-MAZEHALVERSION = 1.3
+MAZEHALVERSION = 1.4
 
 import time
 from multiprocessing import Process
@@ -32,8 +32,30 @@ class MazeHal(object):
 
   def init(self):
     self.gatesP.start()
+    self.sync.setHigh([1,2,3,4,5,6,7,8])
+    self.sync.setLow([1])
+    self.sync.setLow([2])
+    self.sync.setLow([3])
+    self.sync.setLow([4])
+    self.sync.setLow([5])
+    self.sync.setLow([6])
+    self.sync.setLow([7])
+    self.sync.setLow([8])
+    self.buttons.setLedOff('B')
+    self.buttons.setLedOff('Y')
+    self.buttons.setLedOff('W')
+    self.buttons.setLedOff('G')
 
   def exit(self):
+    self.sync.setHigh([1,2,3,4,5,6,7,8])
+    self.sync.setLow([1])
+    self.sync.setLow([2])
+    self.sync.setLow([3])
+    self.sync.setLow([4])
+    self.sync.setLow([5])
+    self.sync.setLow([6])
+    self.sync.setLow([7])
+    self.sync.setLow([8])
     self.gates.exit()
 
 #  def __del__(self):
