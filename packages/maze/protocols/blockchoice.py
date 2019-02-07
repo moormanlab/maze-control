@@ -17,6 +17,7 @@ class BlockChoice (MazeProtocols):
   def init(self,options):
     # initialization
     # put here the code you want to run only once, at first
+    print(options)
     logger.info('Protocol: {a}, Version: {b}'.format(a=PROTOCOL_NAME,b=PROTOCOL_VERSION))
     self.blockSize = options['blockSize']
     self.rewardWindow = options['rewardWindow']
@@ -44,8 +45,8 @@ class BlockChoice (MazeProtocols):
     self.trials = []
     self.addTone(options['toneLeft'],duration=options['toneLeftDuration'],freq=options['toneLeftFrecuency'],volume=options['toneLeftVolume'])
     self.addTone(options['toneRight'],duration=options['toneRightDuration'],freq=options['toneRightFrecuency'],volume=options['toneRightVolume'])
-    logger.info('Tone {a} asociated with Left at {b} Hz, Volume {c}'.format(a=options['toneLeft'],b=options['toneLeftFrecuency'],c=options['toneLeftVolume'])
-    logger.info('Tone {a} asociated with Right at {b} Hz, Volume {c}'.format(a=options['toneRight'],b=options['toneRightFrecuency'],c=options['toneRightVolume'])
+    logger.info('Tone {a} asociated with Left at {b} Hz, Volume {c}'.format(a=options['toneLeft'],b=options['toneLeftFrecuency'],c=options['toneLeftVolume']))
+    logger.info('Tone {a} asociated with Right at {b} Hz, Volume {c}'.format(a=options['toneRight'],b=options['toneRightFrecuency'],c=options['toneRightVolume']))
     time.sleep(.1)
     self.myLastSensor = None
     pass # leave this line in case 'init' is empty
@@ -139,8 +140,7 @@ class BlockChoice (MazeProtocols):
       # waiting to rat to pass the sensor
       #while self.getLastSensorActive()!='C':
       while self.myLastSensor is not 'C':
-          time.sleep(1)
-          print(self.myLastSensor)
+          time.sleep(.1)
           pass
       self.timeInitTraining = time.time()
       self.startTrial()

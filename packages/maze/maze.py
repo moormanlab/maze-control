@@ -80,10 +80,10 @@ def parserProtocol(subject):
     elif line[0] == 'protocolClass':
       protocolClass = line[1]
     else:
-      if isfloat(line[1]):
-        protocolOptions[line[0]] = float(line[1])
-      elif line[1].isdecimal():
+      if line[1].isdecimal():
         protocolOptions[line[0]] = int(line[1])
+      elif isfloat(line[1]):
+        protocolOptions[line[0]] = float(line[1])
       else:
         #is not a float or int, so we pass it as string
         protocolOptions[line[0]] = line[1]
