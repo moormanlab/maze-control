@@ -14,3 +14,8 @@ cp mazer.service /lib/systemd/system/
 systemctl deamon-reload
 systemctl enable mazer.service
 reboot
+
+
+#package needed 
+numpy # for random numbers
+

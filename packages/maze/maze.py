@@ -7,7 +7,6 @@ MAZEVERSION = 1.2
 import logging
 import time
 import importlib
-#from importlib import util as imputil
 from multiprocessing import Process, Queue
 
 from mazeprotocols import MazeProtocols

@@ -16,3 +16,7 @@ class Device(object):
     value = value & 0xFF
     logger.debug("Wrote 0x%02X to register 0x%02X", value, register)
 
+  def writeRaw8(self, value):
+    value = value & 0xFF
+    logger.debug("Wrote 0x%02X, value")
+
