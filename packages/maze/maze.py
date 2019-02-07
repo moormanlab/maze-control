@@ -44,6 +44,13 @@ def printhelp():
   print ('q : exit')
   print ('------------------------------')
 
+def isfloat(val):
+  try:
+    float(val)
+    return True
+  except:
+    return False
+
 def parserProtocol(subject):
   filename = 'subjects/' + subject + '.cfg'
   try:
@@ -73,8 +80,14 @@ def parserProtocol(subject):
     elif line[0] == 'protocolClass':
       protocolClass = line[1]
     else:
-      protocolOptions[line[0]] = line[1]
-
+      if isfloat(line[1]):
+        protocolOptions[line[0]] = float(line[1])
+      elif line[1].isdecimal():
+        protocolOptions[line[0]] = int(line[1])
+      else:
+        #is not a float or int, so we pass it as string
+        protocolOptions[line[0]] = line[1]
+ 
   # validate options
   if protocolFile == '':
     raise NameError("Protocol file name not defined")

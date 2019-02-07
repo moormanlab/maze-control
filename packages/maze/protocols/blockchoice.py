@@ -18,8 +18,8 @@ class BlockChoice (MazeProtocols):
     # initialization
     # put here the code you want to run only once, at first
     logger.info('Protocol: {a}, Version: {b}'.format(a=PROTOCOL_NAME,b=PROTOCOL_VERSION))
-    self.blockSize = int(options['blockSize'])
-    self.rewardWindow = float(options['rewardWindow'])
+    self.blockSize = options['blockSize']
+    self.rewardWindow = options['rewardWindow']
     logger.info('Block Size: {a}'.format(a=self.blockSize))
     logger.info('Reward Window: {a}'.format(a=self.rewardWindow))
     self.multidropNum = options['multidropNum']
@@ -42,11 +42,10 @@ class BlockChoice (MazeProtocols):
     self.trialsCount = {'L':0,'R':0}
     self.trialsCorrect = {'L':0,'R':0}
     self.trials = []
-    self.addTone(int(options['toneLeft']),duration=float(options['toneLeftDuration']),freq=float(options['toneLeftFrecuency']),volume=float(options['toneLeftVolume']))
-    self.addTone(int(options['toneRight']),duration=float(options['toneRightDuration']),freq=float(options['toneRightFrecuency']),volume=float(options['toneRightVolume']))
-    self.addTone(2,duration=1.0,freq=8000,volume=1.0)
-    logger.info('Tone ' + options['toneLeft'] + ' asociated with Left at ' + options['toneLeftFrecuency'] +' Hz, Volume ' + options['toneLeftVolume'])
-    logger.info('Tone ' + options['toneRight'] + ' asociated with Right at ' + options['toneRightFrecuency'] +' Hz, Volume ' + options['toneRightVolume'])
+    self.addTone(options['toneLeft'],duration=options['toneLeftDuration'],freq=options['toneLeftFrecuency'],volume=options['toneLeftVolume'])
+    self.addTone(options['toneRight'],duration=options['toneRightDuration'],freq=options['toneRightFrecuency'],volume=options['toneRightVolume'])
+    logger.info('Tone {a} asociated with Left at {b} Hz, Volume {c}'.format(a=options['toneLeft'],b=options['toneLeftFrecuency'],c=options['toneLeftVolume'])
+    logger.info('Tone {a} asociated with Right at {b} Hz, Volume {c}'.format(a=options['toneRight'],b=options['toneRightFrecuency'],c=options['toneRightVolume'])
     time.sleep(.1)
     self.myLastSensor = None
     pass # leave this line in case 'init' is empty
