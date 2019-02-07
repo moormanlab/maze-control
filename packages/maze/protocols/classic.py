@@ -15,7 +15,7 @@ import numpy as np
 
 
 class Classic (MazeProtocols):
-  def init(self):
+  def init(self,options):
     # initialization
     # put here the code you want to run only once, at first
     logger.info('Protocol: {a}, Version: {b}'.format(a=PROTOCOL_NAME,b=PROTOCOL_VERSION))

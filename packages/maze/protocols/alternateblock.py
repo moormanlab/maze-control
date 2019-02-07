@@ -9,19 +9,34 @@ import logging
 logger=logging.getLogger(__name__)
 
 PROTOCOL_NAME= 'AlternateBlock'
-PROTOCOL_VERSION = '1.0'
+PROTOCOL_VERSION = '1.2'
 
 import numpy as np
 
-
 class AlternateBlock (MazeProtocols):
-  def init(self):
+  def init(self,options):
     # initialization
     # put here the code you want to run only once, at first
+    """ options needed 
+        blockSize:    integer  
+        multidropNum: integer
+       
+        # Stimulus
+        toneLeft             integer
+        toneLeftFrecuency    integer
+        toneLeftVolume       float 0.0 to 1.0
+        toneLeftDuration     float
+        toneRight            integer
+        toneRightFrecuency   integer
+        toneRightVolume      float 0.0 to 1.0
+        toneRightDuration    float
+    """
     logger.info('Protocol: {a}, Version: {b}'.format(a=PROTOCOL_NAME,b=PROTOCOL_VERSION))
-    self.blockSize = 10
+    self.blockSize = options['blockSize']
     logger.info('Block Size: {a}'.format(a=self.blockSize))
-    self.time = 0
+    self.multidropNum = options['multidropNum']
+    logger.info('set multidrop to {a}'.format(a=self.multidropNum))
+    self.setMultiDrop(self.multidropNum)
     self.state = 'start'
     self.openGate('IUL')
     self.openGate('IUR')
@@ -31,17 +46,13 @@ class AlternateBlock (MazeProtocols):
     self.openGate('OBR') # maybe closed
     self.closeGate('IBL')
     self.closeGate('IBR')
-    self.multidone = False
     self.toneDone = False
-    self.setMultiDrop(3)
-    logger.info('set multidrop to 3')
-    self.nextTone = 0
-    self.trialType = None
     self.trialNum = 0
-    self.addTone(2,duration=1.0,freq=1000,volume=1.0)
-    self.addTone(1,duration=1.0,freq=8000,volume=1.0)
-    logger.info('Tone 2 asociated with Left 1 kHz')
-    logger.info('Tone 1 asociated with Right 8 kHz')
+    self.rewardDone = False
+    self.addTone(options['toneLeft'],duration=options['toneLeftDuration'],freq=options['toneLeftFrecuency'],volume=options['toneLeftVolume'])
+    self.addTone(options['toneRight'],duration=options['toneRightDuration'],freq=options['toneRightFrecuency'],volume=options['toneRightVolume'])
+    logger.info('Tone {a} asociated with Left at {b} Hz, Volume {c}'.format(a=options['toneLeft'],b=options['toneLeftFrecuency'],c=options['toneLeftVolume']))
+    logger.info('Tone {a} asociated with Right at {b} Hz, Volume {c}'.format(a=options['toneRight'],b=options['toneRightFrecuency'],c=options['toneRightVolume']))
     time.sleep(1)
     pass # leave this line in case 'init' is empty
 
@@ -54,19 +65,33 @@ class AlternateBlock (MazeProtocols):
 #      ''' If you dont use a handler this function should be commented'''
 #      pass
 #
-#  def sensorHandler(obj,sensor):
-#      ''' If you dont use a handler this function should be commented'''
-#      pass
+
+  def sensorHandler(self,sensor):
+      ''' If you dont use a handler this function should be commented'''
+      logger.info('sensor activated {a}'.format(a=sensor))
+      self.myLastSensor = sensor
+      pass
 
   # Write your own methods
 
   
   def chooseNextTone(self,count):
-    self.nextTone = int((count-1)/self.blockSize) % 2 + 1
+    return int((count-1)/self.blockSize) % 2 + 1
 
   def myFunction(self,param):
     logger.debug(param)
 
+  def startTrial(self):
+    self.trialNum +=1
+    nextTone=self.chooseNextTone(self.trialNum)
+    self.playSound(nextTone)
+    logger.info('Played tone {a} trialNum {b}'.format(a=nextTone,b=self.trialNum))
+    self.trialInit = time.time()
+    self.printStats()
+
+  def printStats(self):
+    tt = time.time() - self.timeInitTraining
+    print ('Trial Num: {c} | Total time = {a} minutes {b} seconds'.format(a=int(tt/60),b=int(tt)%60),c = self.trialNum)
 
   def run(self):
     ''' 
@@ -77,66 +102,54 @@ class AlternateBlock (MazeProtocols):
     try:
       self.trialNum = 0
       self.closeGate('IUR')
+      # waiting to rat to pass the sensor
+      while self.myLastSensor is not 'C':
+          time.sleep(.1)
+          pass
+      self.startTrial()
+      self.timeInitTraining = time.time()
       while True:
         self.myFunction(self.state)
         if self.state == 'start':
           #if self.lastSensorActive()=='UL':
-          self.multidone = False
-          # only for the first trial, should re-think the scheme
-          if self.isSensorActive('C')==True:
-            logger.info('Rat at {a}'.format(a='C'))
-            if self.toneDone == False:
-              self.trialNum +=1
-              self.chooseNextTone(self.trialNum)
-              self.playSound(self.nextTone)
-              logger.info('Played tone {a} trialNum {b}'.format(a=self.nextTone,b=self.trialNum))
-              self.toneDone = True
+          self.rewardDone = False
 
-          if self.isSensorActive('UL')==True:
+          if self.myLastSensor=='UL':
             logger.info('Rat at {a}'.format(a='UL'))
+            #the rat went left
             self.closeGate('IBL')
             self.closeGate('IBR')
-            #self.closeGate('IUR')
             self.openGate('OBL')
-            #the rat went left
             self.state='going left'
-            # check for reward
-            self.toneDone = False
             logger.info('reward on left')
-          #elif self.lastSensorActive()=='UR':
-          elif self.isSensorActive('UR')==True:
+          elif self.myLastSensor=='UR':
             logger.info('Rat at {a}'.format(a='UR'))
             #the rat went right
             self.closeGate('IBL')
             self.closeGate('IBR')
-            #self.closeGate('IUL')
             self.openGate('OBR')
             self.state='going right'
-            self.toneDone = False
             # check for reward
             logger.info('reward on right')
 
         elif self.state == 'going left':
-          #if self.lastSensorActive()=='L':
-          if self.isSensorActive('L')==True:
+          if self.myLastSensor=='L':
             logger.info('Rat at {a}'.format(a='L'))
             self.closeGate('IUL')
             self.openGate('IBL')
             self.state = 'reward left'
-            if self.multidone == False:
+            if self.rewardDone == False:
               logger.info('Giving reward')
               self.multiDrop('L')
-              self.multidone = True
+              self.rewardDone = True
 
         elif self.state == 'reward left':
-          #if self.lastSensorActive()=='BL':
-          if self.isSensorActive('BL')==True:
+          if self.myLastSensor=='BL':
             logger.info('Rat at {a}'.format(a='BL'))
             self.closeGate('OUL')
 
-            self.trialNum +=1
-            self.chooseNextTone(self.trialNum)
-            if self.nextTone == 1:
+            nextTone = self.chooseNextTone(self.trialNum+1)
+            if nextTone == 1:
                 self.openGate('IUL')
             else:
                 self.openGate('IUR')
@@ -146,40 +159,36 @@ class AlternateBlock (MazeProtocols):
             logger.info('Rat at {a}'.format(a='L'))
 
         elif self.state == 'returning left':
-          #if self.lastSensorActive()=='C':
-          if self.isSensorActive('C')==True:
+          if self.myLastSensor=='C':
             logger.info('Rat at {a}'.format(a='C'))
             self.closeGate('OBL')
-            if self.nextTone == 1:
+            nextTone = self.chooseNextTone(self.trialNum+1)
+            if nextTone == 1:
                 self.openGate('OUL')
             else:
                 self.openGate('OUR')
             self.state = 'start'
-            self.playSound(self.nextTone)
-            logger.info('Played tone {a} trialNum {b}'.format(a=self.nextTone,b=self.trialNum))
-            self.toneDone = True
+            self.startTrial()
 
 
         elif self.state == 'going right':
-          #if self.lastSensorActive()=='R':
-          if self.isSensorActive('R')==True:
+          if self.myLastSensor=='R':
             logger.info('Rat at {a}'.format(a='R'))
             self.closeGate('IUR')
             self.openGate('IBR')
             self.state = 'reward right'
-            if self.multidone == False:
+            if self.rewardDone == False:
+              logger.info('Giving reward')
               self.multiDrop('R')
-              self.multidone = True
+              self.rewardDone = True
 
         elif self.state == 'reward right':
-          #if self.lastSensorActive()=='BR':
-          if self.isSensorActive('BR')==True:
+          if self.myLastSensor=='BR':
             logger.info('Rat at {a}'.format(a='BR'))
             self.closeGate('OUR')
 
-            self.trialNum +=1
-            self.chooseNextTone(self.trialNum)
-            if self.nextTone == 1:
+            nextTone = self.chooseNextTone(self.trialNum+1)
+            if nextTone == 1:
                 self.openGate('IUL')
             else:
                 self.openGate('IUR')
@@ -190,22 +199,19 @@ class AlternateBlock (MazeProtocols):
             logger.info('Rat at {a}'.format(a='R'))
                 
         elif self.state == 'returning right':
-          #if self.lastSensorActive()=='C':
-          if self.isSensorActive('C')==True:
+          if self.myLastSensor=='C':
             logger.info('Rat at {a}'.format(a='C'))
             self.closeGate('OBR')
-            if self.nextTone == 1:
+            nextTone = self.chooseNextTone(self.trialNum+1)
+            if nextTone == 1:
                 self.openGate('OUL')
             else:
                 self.openGate('OUR')
             self.state = 'start'
-            self.playSound(self.nextTone)
-            logger.info('Played tone {a} trialNum {b}'.format(a=self.nextTone,b=self.trialNum))
-            self.toneDone = True
+            self.startTrial()
 
-        time.sleep(.025)
+        time.sleep(.01)
 
     except Exception as e:
       logger.error(e)
       print(e)
-

@@ -17,6 +17,21 @@ class BlockChoice (MazeProtocols):
   def init(self,options):
     # initialization
     # put here the code you want to run only once, at first
+    """ options needed 
+        blockSize     integer  
+        multidropNum  integer
+        rewardWindow  float
+       
+        # Stimulus
+        toneLeft             integer
+        toneLeftFrecuency    integer
+        toneLeftVolume       float 0.0 to 1.0
+        toneLeftDuration     float
+        toneRight            integer
+        toneRightFrecuency   integer
+        toneRightVolume      float 0.0 to 1.0
+        toneRightDuration    float
+    """
     logger.info('Protocol: {a}, Version: {b}'.format(a=PROTOCOL_NAME,b=PROTOCOL_VERSION))
     self.blockSize = options['blockSize']
     self.rewardWindow = options['rewardWindow']
@@ -139,7 +154,6 @@ class BlockChoice (MazeProtocols):
     try:
       self.trialNum = 0
       # waiting to rat to pass the sensor
-      #while self.getLastSensorActive()!='C':
       while self.myLastSensor is not 'C':
           time.sleep(.1)
           pass

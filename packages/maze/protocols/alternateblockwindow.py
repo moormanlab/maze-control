@@ -9,19 +9,37 @@ import logging
 logger=logging.getLogger(__name__)
 
 PROTOCOL_NAME= 'AlternateBlockWindow'
-PROTOCOL_VERSION = '1.0'
+PROTOCOL_VERSION = '1.1'
 
 import numpy as np
 
-
 class AlternateBlockWindow (MazeProtocols):
-  def init(self):
+  def init(self,options):
     # initialization
     # put here the code you want to run only once, at first
+    """ options needed 
+        blockSize     integer  
+        multidropNum  integer
+        rewardWindow  float
+       
+        # Stimulus
+        toneLeft             integer
+        toneLeftFrecuency    integer
+        toneLeftVolume       float 0.0 to 1.0
+        toneLeftDuration     float
+        toneRight            integer
+        toneRightFrecuency   integer
+        toneRightVolume      float 0.0 to 1.0
+        toneRightDuration    float
+    """
     logger.info('Protocol: {a}, Version: {b}'.format(a=PROTOCOL_NAME,b=PROTOCOL_VERSION))
-    self.blockSize = 10
-    self.window = 4.0
+    self.blockSize = options['blockSize']
+    self.rewardWindow = options['rewardWindow']
     logger.info('Block Size: {a}'.format(a=self.blockSize))
+    logger.info('Reward Window: {a}'.format(a=self.rewardWindow))
+    self.multidropNum = options['multidropNum']
+    logger.info('set multidrop to {a}'.format(a=self.multidropNum))
+    self.setMultiDrop(self.multidropNum)
     self.state = 'start'
     self.openGate('IUL')
     self.openGate('IUR')
@@ -31,18 +49,15 @@ class AlternateBlockWindow (MazeProtocols):
     self.openGate('OBR') # maybe closed
     self.closeGate('IBL')
     self.closeGate('IBR')
-    self.rewardDone = False
     self.toneDone = False
-    self.setMultiDrop(3)
-    logger.info('set multidrop to 3')
     self.trialNum = 0
     self.rewardDone = False
     self.timeInitTraining = 0
     self.trialInit = 0
-    self.addTone(1,duration=1.0,freq=1000,volume=1.0)
-    self.addTone(2,duration=1.0,freq=8000,volume=1.0)
-    logger.info('Tone 1 asociated with Left 1 kHz')
-    logger.info('Tone 2 asociated with Right 8 kHz')
+    self.addTone(options['toneLeft'],duration=options['toneLeftDuration'],freq=options['toneLeftFrecuency'],volume=options['toneLeftVolume'])
+    self.addTone(options['toneRight'],duration=options['toneRightDuration'],freq=options['toneRightFrecuency'],volume=options['toneRightVolume'])
+    logger.info('Tone {a} asociated with Left at {b} Hz, Volume {c}'.format(a=options['toneLeft'],b=options['toneLeftFrecuency'],c=options['toneLeftVolume']))
+    logger.info('Tone {a} asociated with Right at {b} Hz, Volume {c}'.format(a=options['toneRight'],b=options['toneRightFrecuency'],c=options['toneRightVolume']))
     time.sleep(1)
     pass # leave this line in case 'init' is empty
 
@@ -55,9 +70,12 @@ class AlternateBlockWindow (MazeProtocols):
 #      ''' If you dont use a handler this function should be commented'''
 #      pass
 #
-#  def sensorHandler(obj,sensor):
-#      ''' If you dont use a handler this function should be commented'''
-#      pass
+
+  def sensorHandler(self,sensor):
+      ''' If you dont use a handler this function should be commented'''
+      logger.info('sensor activated {a}'.format(a=sensor))
+      self.myLastSensor = sensor
+      pass
 
   # Write your own methods
 
@@ -90,17 +108,17 @@ class AlternateBlockWindow (MazeProtocols):
       self.trialNum = 0
       self.closeGate('IUR')
       # waiting to rat to pass the sensor
-      while self.isSensorActive('C')==False:
+      while self.myLastSensor is not 'C':
+          time.sleep(.1)
           pass
       self.timeInitTraining = time.time()
       self.startTrial()
       while True:
         self.myFunction(self.state)
         if self.state == 'start':
-          #if self.lastSensorActive()=='UL':
           self.rewardDone = False
 
-          if self.isSensorActive('UL')==True:
+          if self.myLastSensor=='UL':
             logger.info('Rat at {a}'.format(a='UL'))
             #the rat went left
             self.closeGate('IBL')
@@ -108,8 +126,7 @@ class AlternateBlockWindow (MazeProtocols):
             self.openGate('OBL')
             self.state='going left'
             logger.info('reward on left')
-          #elif self.lastSensorActive()=='UR':
-          elif self.isSensorActive('UR')==True:
+          elif self.myLastSensor=='UR':
             logger.info('Rat at {a}'.format(a='UR'))
             #the rat went right
             self.closeGate('IBL')
@@ -120,8 +137,7 @@ class AlternateBlockWindow (MazeProtocols):
             logger.info('reward on right')
 
         elif self.state == 'going left':
-          #if self.lastSensorActive()=='L':
-          if self.isSensorActive('L')==True:
+          if self.myLastSensor=='L':
             logger.info('Rat at {a}'.format(a='L'))
             self.closeGate('IUL')
             self.openGate('IBL')
@@ -136,8 +152,7 @@ class AlternateBlockWindow (MazeProtocols):
                   self.rewardDone = True
 
         elif self.state == 'reward left':
-          #if self.lastSensorActive()=='BL':
-          if self.isSensorActive('BL')==True:
+          if self.myLastSensor=='BL':
             logger.info('Rat at {a}'.format(a='BL'))
             self.closeGate('OUL')
 
@@ -152,8 +167,7 @@ class AlternateBlockWindow (MazeProtocols):
             logger.info('Rat at {a}'.format(a='L'))
 
         elif self.state == 'returning left':
-          #if self.lastSensorActive()=='C':
-          if self.isSensorActive('C')==True:
+          if self.myLastSensor=='C':
             logger.info('Rat at {a}'.format(a='C'))
             self.closeGate('OBL')
             nextTone = self.chooseNextTone(self.trialNum+1)
@@ -166,8 +180,7 @@ class AlternateBlockWindow (MazeProtocols):
 
 
         elif self.state == 'going right':
-          #if self.lastSensorActive()=='R':
-          if self.isSensorActive('R')==True:
+          if self.myLastSensor=='R':
             logger.info('Rat at {a}'.format(a='R'))
             self.closeGate('IUR')
             self.openGate('IBR')
@@ -182,8 +195,7 @@ class AlternateBlockWindow (MazeProtocols):
                   self.rewardDone = True
 
         elif self.state == 'reward right':
-          #if self.lastSensorActive()=='BR':
-          if self.isSensorActive('BR')==True:
+          if self.myLastSensor=='BR':
             logger.info('Rat at {a}'.format(a='BR'))
             self.closeGate('OUR')
 
@@ -199,8 +211,7 @@ class AlternateBlockWindow (MazeProtocols):
             logger.info('Rat at {a}'.format(a='R'))
                 
         elif self.state == 'returning right':
-          #if self.lastSensorActive()=='C':
-          if self.isSensorActive('C')==True:
+          if self.myLastSensor=='C':
             logger.info('Rat at {a}'.format(a='C'))
             self.closeGate('OBR')
             nextTone = self.chooseNextTone(self.trialNum+1)

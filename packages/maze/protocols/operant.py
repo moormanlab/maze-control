@@ -15,7 +15,7 @@ PROTOCOL_NAME= 'Operant'
 PROTOCOL_VERSION = '1.1'
 
 class OperantLeft (MazeProtocols):
-  def init(self):
+  def init(self,options):
     # initialization
     # put here the code you want to run only once, at first
     # trainType should be 'L' of 'R'
