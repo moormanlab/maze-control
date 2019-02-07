@@ -2,7 +2,7 @@
 # Maze control
 # Author: Ariel Burman
 
-MAZEVERSION = 1.1
+MAZEVERSION = 1.2
 
 import logging
 import time
@@ -44,8 +44,46 @@ def printhelp():
   print ('q : exit')
   print ('------------------------------')
 
+def parserProtocol(subject):
+  filename = 'subjects/' + subject + '.cfg'
+  try:
+    filen = open(filename,'r')
+  except:
+    raise NameError('File ' + filename + ' not found')
+  lines = filen.readlines()
+  filen.close()
+  import re
+
+  protocolOptions = {}
+  protocolFile = ''
+  protocolClass = ''
+
+  for line in lines:
+    #get rid of comments
+    line = re.split('#', line)
+    line = [i.strip() for i in line]
+    if line[0] == '':
+      continue
+    line = re.split('=', line[0])
+    line = [i.strip() for i in line]
+    if len(line) == 1:
+      pass
+    if line[0] == 'protocolFile':
+      protocolFile = line[1]
+    elif line[0] == 'protocolClass':
+      protocolClass = line[1]
+    else:
+      protocolOptions[line[0]] = line[1]
+
+  # validate options
+  if protocolFile == '':
+    raise NameError("Protocol file name not defined")
+  if protocolClass == '':
+    raise NameError("Protocol Class name not defined")
+  return protocolFile,protocolClass,protocolOptions
+
 class Maze(object):
-  def __init__(self,protocolFile=None,protocolClass=None):
+  def __init__(self,protocolFile,protocolClass,protocolOptions=None):
     module_spec = check_module('protocols.'+protocolFile)
     if module_spec:
         module = importlib.util.module_from_spec(module_spec)
@@ -62,13 +100,9 @@ class Maze(object):
     logger.info('Maze version {a}'.format(a=MAZEVERSION))
 
 
-    self.protocol = Protokol()
-    #protocolP.daemon = True
-    #self.keyboardP = Process(target=self.keyboardCap)
-    #self.keyboardP.daemon=True
+    self.protocol = Protokol(protocolOptions)
 
   def start(self):
-      #self.keyboardP.start()
       self.protocolP = Process(target=self.protocol._run)
       self.protocolP.start()
       self.run()
@@ -183,11 +217,8 @@ if __name__ == '__main__':
          format=formatter_str, datefmt=dateformat)
   logger.info('Today\'s date: '+today)
   logger.info('maze test')
-  #maze = Maze('skinner','Skinner')
-  protocolFile = 'blockchoice'
-  protocolClass = 'BlockChoice'
-  protocolOption = None
-  maze = Maze(protocolFile,protocolClass)
+  [protocolFile,protocolClass,protocolOptions] = parserProtocol(subjectname)
+  maze = Maze(protocolFile,protocolClass,protocolOptions)
   
   try:
     maze.start()

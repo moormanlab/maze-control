@@ -9,19 +9,22 @@ import logging
 logger=logging.getLogger(__name__)
 
 PROTOCOL_NAME= 'BlockChoice'
-PROTOCOL_VERSION = '1.3'
+PROTOCOL_VERSION = '1.4'
 
 import numpy as np
 
 class BlockChoice (MazeProtocols):
-  def init(self):
+  def init(self,options):
     # initialization
     # put here the code you want to run only once, at first
     logger.info('Protocol: {a}, Version: {b}'.format(a=PROTOCOL_NAME,b=PROTOCOL_VERSION))
-    self.blockSize = 10
-    self.rewardWindow = 5.0
+    self.blockSize = int(options['blockSize'])
+    self.rewardWindow = float(options['rewardWindow'])
     logger.info('Block Size: {a}'.format(a=self.blockSize))
     logger.info('Reward Window: {a}'.format(a=self.rewardWindow))
+    self.multidropNum = options['multidropNum']
+    logger.info('set multidrop to {a}'.format(a=self.multidropNum))
+    self.setMultiDrop(self.multidropNum)
     self.state = 'start'
     self.closeGateFast('IUL')
     self.closeGateFast('IUR')
@@ -31,9 +34,6 @@ class BlockChoice (MazeProtocols):
     self.openGateFast('OBR') # maybe closed
     self.closeGateFast('IBL')
     self.closeGateFast('IBR')
-    self.multidropNum = 2
-    self.setMultiDrop(self.multidropNum)
-    logger.info('set multidrop to {a}'.format(a=self.multidropNum))
     self.trialNum = 0
     self.rewardDone = False
     self.timeInitTraining = 0
@@ -42,10 +42,11 @@ class BlockChoice (MazeProtocols):
     self.trialsCount = {'L':0,'R':0}
     self.trialsCorrect = {'L':0,'R':0}
     self.trials = []
-    self.addTone(1,duration=1.0,freq=1000,volume=0.7)
+    self.addTone(int(options['toneLeft']),duration=float(options['toneLeftDuration']),freq=float(options['toneLeftFrecuency']),volume=float(options['toneLeftVolume']))
+    self.addTone(int(options['toneRight']),duration=float(options['toneRightDuration']),freq=float(options['toneRightFrecuency']),volume=float(options['toneRightVolume']))
     self.addTone(2,duration=1.0,freq=8000,volume=1.0)
-    logger.info('Tone 1 asociated with Left 1 kHz')
-    logger.info('Tone 2 asociated with Right 8 kHz')
+    logger.info('Tone ' + options['toneLeft'] + ' asociated with Left at ' + options['toneLeftFrecuency'] +' Hz, Volume ' + options['toneLeftVolume'])
+    logger.info('Tone ' + options['toneRight'] + ' asociated with Right at ' + options['toneRightFrecuency'] +' Hz, Volume ' + options['toneRightVolume'])
     time.sleep(.1)
     self.myLastSensor = None
     pass # leave this line in case 'init' is empty
@@ -139,7 +140,8 @@ class BlockChoice (MazeProtocols):
       # waiting to rat to pass the sensor
       #while self.getLastSensorActive()!='C':
       while self.myLastSensor is not 'C':
-          time.sleep(.1)
+          time.sleep(1)
+          print(self.myLastSensor)
           pass
       self.timeInitTraining = time.time()
       self.startTrial()
@@ -149,7 +151,6 @@ class BlockChoice (MazeProtocols):
           self.rewardDone = False
 
           if self.myLastSensor=='UL':
-          #if self.isSensorActive('UL')==True:
             logger.info('Rat at {a}'.format(a='UL'))
             #the rat went left
             self.closeGateFast('IBL')
@@ -159,7 +160,6 @@ class BlockChoice (MazeProtocols):
             self.state='going left'
             logger.info('reward on left')
           elif self.myLastSensor=='UR':
-          #elif self.isSensorActive('UR')==True:
             logger.info('Rat at {a}'.format(a='UR'))
             #the rat went right
             self.closeGateFast('IBL')
@@ -247,4 +247,3 @@ class BlockChoice (MazeProtocols):
     except Exception as e:
       logger.error(e)
       print(e)
-

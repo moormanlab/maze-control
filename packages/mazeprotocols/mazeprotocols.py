@@ -1,7 +1,7 @@
 # Protocol base class for maze training
 # Author: Ariel Burman
 
-PROTOCOLSVERSION = 1.4
+PROTOCOLSVERSION = 1.5
 
 import time
 import signal,sys
@@ -10,9 +10,10 @@ logger=logging.getLogger(__name__)
 from mazehal import MazeHal
 
 class MazeProtocols(object):
-  def __init__(self):
+  def __init__(self,options=None):
     signal.signal(signal.SIGTERM, self.__exit_gracefully)  
     logger.info('Maze Protocols version {a}'.format(a=PROTOCOLSVERSION))
+    self._options = options
 
   def _run(self):
     if 'sensorHandler' in dir(self):
@@ -27,7 +28,7 @@ class MazeProtocols(object):
     self._mazehal = MazeHal(buttonHandler=buttonH,sensorHandler=sensorH)
     self._mazehal.init()
     self._mazehal.sync.startTraining()
-    self.init()
+    self.init(self._options)
     self.run()
    
   def __exit_gracefully(self,a,b):
