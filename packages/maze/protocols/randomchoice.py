@@ -46,10 +46,12 @@ class RandomChoice (MazeProtocols):
     logger.info('Tone {a} asociated with Right at {b} Hz, Volume {c}'.format(a=options['toneRight'],b=options['toneRightFrecuency'],c=options['toneRightVolume']))
     time.sleep(.1)
     self.myLastSensor = None
+    self.setSyncH([1])
     pass # leave this line in case 'init' is empty
 
   def exit(self):
     # ending protocol. cleanup code. probably loggin stats.
+    self.setSyncL([1])
     self.printStats()
     logger.info(self.trials)
     print('bye bye')
@@ -59,6 +61,7 @@ class RandomChoice (MazeProtocols):
 #      ''' If you dont use a handler this function should be commented'''
 #      pass
 #
+
   def sensorHandler(self,sensor):
       ''' If you dont use a handler this function should be commented'''
       logger.info('sensor activated {a}'.format(a=sensor))
@@ -66,7 +69,6 @@ class RandomChoice (MazeProtocols):
       pass
 
   # Write your own methods
-
   
   def chooseTone(self,trial):
     return round(np.random.random()+1)
@@ -84,10 +86,21 @@ class RandomChoice (MazeProtocols):
         
     self.trials.append([self.trialNum, self.currentTrial,0])
     self.setSyncTrial()
-    self.setSyncH([1,'IR'])
+    self.setSyncH(['IR'])
     self.playSound(nextTone)
-    logger.info('Played tone {a} trialNum {b}'.format(a=nextTone,b=self.trialNum))
     self.trialInit = time.time()
+    if nextTone==1:
+      self.setSyncH([2,7])
+      time.sleep(.05)
+      self.setSyncL([2,7])
+    else:
+      self.setSyncH([3,8])
+      time.sleep(.05)
+      self.setSyncL([3,8])
+    time.sleep(.05)
+    self.setSyncL(['IR'])
+
+    logger.info('Played tone {a} trialNum {b}'.format(a=nextTone,b=self.trialNum))
     self.trialsCount[self.currentTrial] +=1
     time.sleep(1.2)
     if (self.trialNum % 2):
@@ -103,7 +116,7 @@ class RandomChoice (MazeProtocols):
     msg2 = 'Total trial: {a}/{b} = {c}% | Left: {d}/{e} = {f}% | Right: {g}/{h} = {i}%'.format(
         a = (self.trialsCorrect['L']+self.trialsCorrect['R']),
         b = (self.trialsCount['L']+self.trialsCount['R']),
-        c=round(100*(self.trialsCorrect['L']+self.trialsCorrect['R'])/(self.trialsCount['L']+self.trialsCount['R']+0.0001)),
+        c = round(100*(self.trialsCorrect['L']+self.trialsCorrect['R'])/(self.trialsCount['L']+self.trialsCount['R']+0.0001)),
         d = self.trialsCorrect['L'] ,
         e = self.trialsCount['L'] ,
         f = round(100*self.trialsCorrect['L']/(self.trialsCount['L']+0.0001)),
@@ -220,8 +233,7 @@ class RandomChoice (MazeProtocols):
             self.closeGateFast('OUR')
             self.state = 'returning right'
 
-          #if self.getLastSensorActive()=='R':
-          if self.isSensorActive('R')==True:
+          if self.myLastSensor == 'R':
             logger.info('Rat at {a}'.format(a='R'))
                 
         elif self.state == 'returning right':
