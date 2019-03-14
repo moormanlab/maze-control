@@ -46,7 +46,7 @@ class RandomChoice (MazeProtocols):
     logger.info('Tone {a} asociated with Right at {b} Hz, Volume {c}'.format(a=options['toneRight'],b=options['toneRightFrecuency'],c=options['toneRightVolume']))
     time.sleep(.1)
     self.myLastSensor = None
-    self.setSyncH([1])
+    #self.setSyncH([1])
     pass # leave this line in case 'init' is empty
 
   def exit(self):
@@ -144,7 +144,7 @@ class RandomChoice (MazeProtocols):
       self.timeInitTraining = time.time()
       self.startTrial()
       while True:
-        self.myFunction(self.state)
+        #self.myFunction(self.state)
         if self.state == 'start':
           self.rewardDone = False
 
@@ -245,7 +245,7 @@ class RandomChoice (MazeProtocols):
             self.state = 'start'
             self.startTrial()
 
-        time.sleep(.01)
+        time.sleep(.02)
 
     except Exception as e:
       logger.error(e)

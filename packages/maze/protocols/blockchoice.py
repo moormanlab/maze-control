@@ -48,7 +48,7 @@ class BlockChoice (MazeProtocols):
     logger.info('Tone {a} asociated with Right at {b} Hz, Volume {c}'.format(a=options['toneRight'],b=options['toneRightFrecuency'],c=options['toneRightVolume']))
     time.sleep(.1)
     self.myLastSensor = None
-    self.setSyncH([1])
+    #self.setSyncH([1])
     pass # leave this line in case 'init' is empty
 
   def exit(self):

@@ -3,6 +3,7 @@ from mazehal.gates import MazeGates
 
 
 import termios, fcntl, sys, os
+import time
 fd = sys.stdin.fileno()
 oldterm = termios.tcgetattr(fd)
 newattr = termios.tcgetattr(fd)
@@ -35,6 +36,7 @@ try:
     p.start()
     printhelp()
     gates.openAllFast()
+    time.sleep(2)
     gates.releaseAll()
     while True:
         try:
