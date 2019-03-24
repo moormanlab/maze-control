@@ -129,4 +129,7 @@ if __name__ == '__main__':
   sync.setHigh([1,3,5])
   time.sleep(1)
   sync.setLow([2,3,4])
+  sync.setHigh([1,2,3,4,5,6,7,8])
+  time.sleep(1)
+  sync.setLow([1,2,3,4,5,6,7,8])
   time.sleep(1)

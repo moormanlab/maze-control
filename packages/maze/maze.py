@@ -206,9 +206,12 @@ class Maze(object):
     logger.warning('Exiting')
     self.protocolP.terminate()
     sys.exit()
-      
+
 if __name__ == '__main__':
   import sys,os
+  if sys.version_info < (3,5,3):
+      print ('Python 3.5.3 and above is needed')
+      exit(1)
   if not os.path.exists('./logs/'):
     os.makedirs('./logs/')
   dateformat = '%H:%M:%S'
@@ -231,7 +234,7 @@ if __name__ == '__main__':
   logger.info('maze test')
   [protocolFile,protocolClass,protocolOptions] = parserProtocol(subjectname)
   maze = Maze(protocolFile,protocolClass,protocolOptions)
-  
+
   try:
     maze.start()
 

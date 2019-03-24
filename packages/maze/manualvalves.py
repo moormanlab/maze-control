@@ -1,8 +1,12 @@
+
+import termios, fcntl, sys, os
+if sys.version_info < (3,5,3):
+    print ('Python 3.5.3 and above is needed')
+    exit(1)
+
 from mazehal.valves import MazeValves
 from mazehal.gates import MazeGates
 
-
-import termios, fcntl, sys, os
 import time
 fd = sys.stdin.fileno()
 oldterm = termios.tcgetattr(fd)

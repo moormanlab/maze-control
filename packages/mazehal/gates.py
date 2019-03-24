@@ -39,10 +39,10 @@ pwmV = {'IUL': (0,[218, 228, 537, 530]),
         'IBL': (1,[545, 528, 195, 210]),
         'OBL': (2,[210, 220, 555, 544]),
         'OUL': (3,[570, 552, 206, 213]),
-        'OBR': (4,[520, 510, 220, 222]),
-        'OUR': (5,[225, 230, 550, 545]),
-        'IBR': (6,[195, 200, 500, 492]),
-        'IUR': (7,[545, 540, 200, 205]) }
+        'OBR': (4,[520, 505, 205, 210]),
+        'OUR': (5,[225, 240, 550, 535]),
+        'IBR': (6,[195, 200, 500, 485]),
+        'IUR': (7,[535, 525, 200, 210]) }
 
 
 class Motor(object):
@@ -107,7 +107,7 @@ class Gate(object):
         #self.motors[key].setPosition(now)
       self.motor.setPosition(goal)
       time.sleep(0.05)
-      self.motor.setPosition(after)
+      self.motor.setPosition(0) #was after
       logger.debug('gate %s position after = %s',self.name,self.motor.getPosition())
     except Exception as e:
       print (e)
@@ -125,8 +125,8 @@ class Gate(object):
     logger.debug('Fast gate %s | now %s | goal %s | after %s',self.name,now,goal,after)
     try:
       self.motor.setPosition(goal)
-      time.sleep(0.5)
-      self.motor.setPosition(after)
+      time.sleep(0.7)
+      self.motor.setPosition(0) #was after
       logger.debug('gate %s position after = %s',self.name,self.motor.getPosition())
     except Exception as e:
       print (e)
@@ -305,25 +305,31 @@ if __name__ == '__main__':
     p = Process(target=gates.run)
     p.start()
     time.sleep(0.5)
-    gates.openGateFast('IUL')
-    gates.openGateFast('IUL')
-    gates.openGate('IUR')
-    while gates.isOpen('IUR') == False:
-        pass
-    gates.closeGateFast('IUL')
-    time.sleep(1.5)
-
-    logger.info('Gates Clossing')
+#    gates.openGateFast('IUL')
+#    gates.openGateFast('IUL')
+#    gates.openGate('IUR')
+#    while gates.isOpen('IUR') == False:
+#        pass
+#    gates.closeGateFast('IUL')
+#    time.sleep(1.5)
+#
+#    logger.info('Gates Clossing')
     gates.closeAll()
-    while gates.isClose('IUR') == False:
-        pass
-    while gates.isClose('IUL') == False:
-        pass
-    logger.info('Gates Test')
-    gates.testGates()
-    gates.testAllOnce()
     time.sleep(1.5)
-    logger.info('Exiting')
+    gates.openGateFast('IUL')
+    gates.openGateFast('IBL')
+    time.sleep(1)
+    gates.closeGateFast('IUL')
+    gates.closeGateFast('IBL')
+#    while gates.isClose('IUR') == False:
+#        pass
+#    while gates.isClose('IUL') == False:
+#        pass
+#    logger.info('Gates Test')
+#    gates.testGates()
+#    gates.testAllOnce()
+    time.sleep(1.5)
+#    logger.info('Exiting')
     gates.releaseAll()
     gates.exit()
     p.join()

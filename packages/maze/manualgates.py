@@ -1,7 +1,8 @@
-from mazehal.gates import MazeGates
-
-
 import termios, fcntl, sys, os
+if sys.version_info < (3,5,3):
+    print ('Python 3.5.3 and above is needed')
+    exit(1)
+from mazehal.gates import MazeGates
 import time
 fd = sys.stdin.fileno()
 oldterm = termios.tcgetattr(fd)
@@ -14,15 +15,14 @@ fcntl.fcntl(fd, fcntl.F_SETFL, oldflags | os.O_NONBLOCK)
 
 def printhelp():
     print ('------------------------------')
-    print ('q : open left')
-    print ('a : close left')
-    print ('c : drop left')
-    print ('t : open right')
-    print ('g : close right')
-    print ('b : drop right')
-    print ('u : set drops')
-    print ('j : set delay drop')
-    print ('m : set delay multi drop')
+    print ('w : outter upper left')
+    print ('s : outter bottom left')
+    print ('e : inner upper left')
+    print ('d : inner bottom left')
+    print ('r : inner upper right')
+    print ('f : inner bottom right')
+    print ('t : outter upper right')
+    print ('g : outter bottom right')
     print ('? o h : help')
     print ('q : exit')
     print ('------------------------------')

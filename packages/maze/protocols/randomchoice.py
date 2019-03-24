@@ -193,9 +193,8 @@ class RandomChoice (MazeProtocols):
             logger.info('Rat at {a}'.format(a='BL'))
             self.closeGateFast('OUL')
             self.state = 'returning left'
+            self.startTrial()
 
-          if self.myLastSensor=='L':
-            logger.info('Rat at {a}'.format(a='L'))
 
         elif self.state == 'returning left':
           if self.myLastSensor=='C':
@@ -204,7 +203,6 @@ class RandomChoice (MazeProtocols):
             self.openGateFast('OUL')
             self.openGateFast('OUR')
             self.state = 'start'
-            self.startTrial()
 
 
         elif self.state == 'going right':
@@ -232,10 +230,8 @@ class RandomChoice (MazeProtocols):
             logger.info('Rat at {a}'.format(a='BR'))
             self.closeGateFast('OUR')
             self.state = 'returning right'
+            self.startTrial()
 
-          if self.myLastSensor == 'R':
-            logger.info('Rat at {a}'.format(a='R'))
-                
         elif self.state == 'returning right':
           if self.myLastSensor=='C':
             logger.info('Rat at {a}'.format(a='C'))
@@ -243,9 +239,8 @@ class RandomChoice (MazeProtocols):
             self.openGateFast('OUL')
             self.openGateFast('OUR')
             self.state = 'start'
-            self.startTrial()
 
-        time.sleep(.02)
+        time.sleep(.01)
 
     except Exception as e:
       logger.error(e)
