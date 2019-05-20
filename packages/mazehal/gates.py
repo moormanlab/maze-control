@@ -80,10 +80,18 @@ class Gate(object):
     return bool(self._moving.value)
 
   def isOpen(self):
-    return self.motor.getPosition()==self.openAfter
+    a = self.motor.getPosition()
+    if (a==self.openAfter) or (a==self.openGoal):
+      return True
+    else:
+      return False
 
   def isClose(self):
-    return self.motor.getPosition()==self.closeAfter
+    a = self.motor.getPosition()
+    if (a==self.closeAfter) or (a==self.closeGoal):
+      return True
+    else:
+      return False
 
   def _moveSlow(self,goal,after):
     self.lock.acquire()
