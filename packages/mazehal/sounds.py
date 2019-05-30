@@ -40,7 +40,6 @@ class MazeSounds():
         return self.play_obj.is_playing()
 
   def addTone(self,key,duration=1.0, freq=1000.0, volume=1.0, sample_rate = 44100):
-    volume = volume
     logger.info('Sound %s : Tone freq = %s Hz, duration = %s s, sample_rate = %s, volume = %s',key,freq,duration,sample_rate,volume)
   
     # get timesteps for each sample, T is note duration in seconds
@@ -74,10 +73,11 @@ class MazeSounds():
     logger.debug(str(buff))
 
   def addWhiteNoise(self,key,duration=5.0,volume=1.0, sample_rate = 44100):
-    noise = np.random.normal(0,1,duration*sample_rate)
-    noise *= 32767/3.5 * volume
+    noise = np.random.normal(0,1,round(duration*sample_rate))
+    noise *= 32767 * volume /np.max(np.abs(noise))
     noise = noise.astype(np.int16)
-    self.sound[key] = sa.WaveObject(buff,1,2,sample_rate)
+    self.sound[key] = sa.WaveObject(noise,1,2,sample_rate)
+    print(noise)
 
 if __name__=='__main__':
   import sys,os
@@ -120,8 +120,12 @@ if __name__=='__main__':
 #  audio.play_obj.wait_done()
 
 
-  audio.addTone(key=4,duration=10.0,volumen=1.0,sample_rate=sample_rate)
+  audio.addWhiteNoise(key=4,duration=3.0,volume=1.0,sample_rate=sample_rate)
   audio.play(4)
-  time.sleep(5)
+  time.sleep(4)
+  print(audio.isPlaying())
+  audio.play(4)
+  time.sleep(1)
+  print(audio.isPlaying())
   audio.stop()
   
