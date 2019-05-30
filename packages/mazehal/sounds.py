@@ -95,7 +95,7 @@ if __name__=='__main__':
 
   sample_rate = 44100
   audio = MazeSounds()
-  audio.addTone(key=1,duration=3.0,freq=1000.0,volume=0.7,sample_rate=sample_rate)
+  audio.addTone(key=1,duration=3.0,freq=1000.0,volume=0.5,sample_rate=sample_rate)
   audio.addTone(key=2,duration=3.0,freq=8000.0,volume=1.0,sample_rate=sample_rate)
   
   import time
@@ -115,9 +115,9 @@ if __name__=='__main__':
   audio.playBlocking(2)
   time.sleep(2)
   print(audio.isPlaying())
-  audio.play(3)
-  print(audio.isPlaying())
-  audio.play_obj.wait_done()
+#  audio.play(3)
+#  print(audio.isPlaying())
+#  audio.play_obj.wait_done()
 
 
   audio.addTone(key=4,duration=10.0,volumen=1.0,sample_rate=sample_rate)

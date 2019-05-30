@@ -48,7 +48,7 @@ class BlockChoice (MazeProtocols):
     logger.info('Tone {a} asociated with Right at {b} Hz, Volume {c}'.format(a=options['toneRight'],b=options['toneRightFrecuency'],c=options['toneRightVolume']))
     time.sleep(.1)
     self.myLastSensor = None
-    self.setSyncH([1])
+    #self.setSyncH([1])
     pass # leave this line in case 'init' is empty
 
   def exit(self):
@@ -195,6 +195,7 @@ class BlockChoice (MazeProtocols):
             logger.info('Rat at {a}'.format(a='BL'))
             self.closeGateFast('OUL')
             self.state = 'returning left'
+            self.startTrial()
 
         elif self.state == 'returning left':
           if self.myLastSensor=='C':
@@ -203,7 +204,6 @@ class BlockChoice (MazeProtocols):
             self.openGateFast('OUL')
             self.openGateFast('OUR')
             self.state = 'start'
-            self.startTrial()
 
 
         elif self.state == 'going right':
@@ -231,6 +231,7 @@ class BlockChoice (MazeProtocols):
             logger.info('Rat at {a}'.format(a='BR'))
             self.closeGateFast('OUR')
             self.state = 'returning right'
+            self.startTrial()
                 
         elif self.state == 'returning right':
           if self.myLastSensor=='C':
@@ -239,7 +240,6 @@ class BlockChoice (MazeProtocols):
             self.openGateFast('OUL')
             self.openGateFast('OUR')
             self.state = 'start'
-            self.startTrial()
 
         time.sleep(.01)
 

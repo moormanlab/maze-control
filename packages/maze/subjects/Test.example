@@ -1,6 +1,6 @@
-protocolFile = blockchoice    #the name of the protocol file, whithout .py and without inverted commas
-protocolClass = BlockChoice   #the name of the protocol class, without inverted commas
-    
+protocolFile = randomchoice    #the name of the protocol file, whithout .py and without inverted commas
+protocolClass = RandomChoice   #the name of the protocol class, without inverted commas
+
 # Stimulus
 toneLeft = 1                     # the tone used to indicate rat to go left
 toneLeftFrecuency = 1000
@@ -8,7 +8,7 @@ toneLeftVolume=0.5
 toneLeftDuration=1.0
 toneRight = 2
 toneRightFrecuency = 8000
-toneRightVolume=0.5
+toneRightVolume=1.0
 toneRightDuration=1.0
 
 #blockchoice
