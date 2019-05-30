@@ -73,11 +73,11 @@ class MazeSounds():
     logger.debug(str(buff))
 
   def addWhiteNoise(self,key,duration=5.0,volume=1.0, sample_rate = 44100):
+    logger.info('Sound %s : White noise random generated, duration = %s s, sample_rate = %s, volume = %s',key,duration,sample_rate,volume)
     noise = np.random.normal(0,1,round(duration*sample_rate))
     noise *= 32767 * volume /np.max(np.abs(noise))
     noise = noise.astype(np.int16)
     self.sound[key] = sa.WaveObject(noise,1,2,sample_rate)
-    print(noise)
 
 if __name__=='__main__':
   import sys,os
