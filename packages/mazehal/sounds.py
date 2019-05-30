@@ -1,7 +1,7 @@
 # Sounds for maze
 # Author: Ariel Burman
 
-SOUNDSVERSION = 1.0
+SOUNDSVERSION = 1.1
 
 import numpy as np
 import simpleaudio as sa
@@ -22,6 +22,11 @@ class MazeSounds():
   def play(self,key):
     self.play_obj = self.sound[key].play()
     logger.info('play audio %s',key)
+
+  def stop(self):
+    if self.isPlaying():
+      self.play_obj.stop()
+      logger.info('stop current sound')
     
   def playBlocking(self,key):
     self.play_obj = self.sound[key].play()
@@ -68,6 +73,11 @@ class MazeSounds():
     self.sound[key] = sa.WaveObject(buff,chan,2,sample_rate)
     logger.debug(str(buff))
 
+  def addWhiteNoise(self,key,duration=5.0,volume=1.0, sample_rate = 44100):
+    noise = np.random.normal(0,1,duration*sample_rate)
+    noise *= 32767/3.5 * volume
+    noise = noise.astype(np.int16)
+    self.sound[key] = sa.WaveObject(buff,1,2,sample_rate)
 
 if __name__=='__main__':
   import sys,os
@@ -110,3 +120,8 @@ if __name__=='__main__':
   audio.play_obj.wait_done()
 
 
+  audio.addTone(key=4,duration=10.0,volumen=1.0,sample_rate=sample_rate)
+  audio.play(4)
+  time.sleep(5)
+  audio.stop()
+  
