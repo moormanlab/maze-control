@@ -2,11 +2,11 @@
 # Maze control
 # Author: Ariel Burman
 
-MAZEVERSION = 1.2
+MAZEVERSION = 1.3
 
 import logging
 import time
-import importlib
+from importlib import util
 from multiprocessing import Process, Queue
 
 from mazeprotocols import MazeProtocols
@@ -18,9 +18,7 @@ def check_module(module_name):
   Checks if module can be imported without actually
   importing it
   """
-  logger.debug(module_name)
-  logger.debug(dir(importlib))
-  module_spec = importlib.util.find_spec(module_name)
+  module_spec = util.find_spec(module_name)
   if module_spec is None:
       logger.info('Module: {} not found'.format(module_name))
       return None
@@ -55,7 +53,11 @@ def parserProtocol(subject):
   try:
     filen = open(filename,'r')
   except:
-    raise NameError('File ' + filename + ' not found')
+    print('Configuration File is missing. Creating one from template Test.example')
+    import shutil
+    shutil.copy('subjects/Test.example',filename)
+    logger.info('Using configuration template')
+    filen = open(filename,'r')
   lines = filen.readlines()
   filen.close()
   import re
@@ -98,7 +100,7 @@ class Maze(object):
   def __init__(self,protocolFile,protocolClass,protocolOptions=None):
     module_spec = check_module('protocols.'+protocolFile)
     if module_spec:
-        module = importlib.util.module_from_spec(module_spec)
+        module = util.module_from_spec(module_spec)
         module_spec.loader.exec_module(module)
     else:
         raise NameError("Module doesn't exist")
@@ -207,7 +209,7 @@ class Maze(object):
     self.protocolP.terminate()
     sys.exit()
 
-if __name__ == '__main__':
+def main(argv=None):
   import sys,os
   if sys.version_info < (3,5,3):
       print ('Python 3.5.3 and above is needed')
@@ -216,7 +218,14 @@ if __name__ == '__main__':
     os.makedirs('./logs/')
   dateformat = '%H:%M:%S'
   formatter_str = '%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s'
-  subjectname = 'Test' # 'Reed' 'Sue' 'Jhonny' 'Ben'
+
+  try:
+    subjectname = argv[1]
+  except:
+    print('''Warning: Subject Name is missing. Using 'Test' ''') # 'Reed' 'Sue' 'Jhonny' 'Ben'
+    subjectname='Test'
+  print('Subject Name: {a}'.format(a=subjectname))
+  
   import datetime
   today = datetime.date.today().strftime("%Y-%m-%d")
   Snum = 0
@@ -231,8 +240,8 @@ if __name__ == '__main__':
   logging.basicConfig(filename=logfile,filemode='w+',level=logging.DEBUG,
          format=formatter_str, datefmt=dateformat)
   logger.info('Today\'s date: '+today)
-  logger.info('maze test')
   [protocolFile,protocolClass,protocolOptions] = parserProtocol(subjectname)
+  print('Using Protocol: {}'.format(protocolClass))
   maze = Maze(protocolFile,protocolClass,protocolOptions)
 
   try:
@@ -243,3 +252,9 @@ if __name__ == '__main__':
     print(inst)
     logger.exeption('Exception ocurred')
     logger.error(inst.args)
+
+
+
+if __name__ == '__main__':
+    import sys
+    main(sys.argv)
