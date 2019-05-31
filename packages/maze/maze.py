@@ -236,8 +236,15 @@ def main(argv=None):
         break
     if Snum == 99:
         raise NameError('Too many sessions in one day')
+  
+  loglevel=logging.INFO
+  try:
+    if argv[2]=='--debug':
+      loglevel=loggin.DEBUG
+  except:
+    pass
 
-  logging.basicConfig(filename=logfile,filemode='w+',level=logging.DEBUG,
+  logging.basicConfig(filename=logfile,filemode='w+',level=loglevel,
          format=formatter_str, datefmt=dateformat)
   logger.info('Today\'s date: '+today)
   [protocolFile,protocolClass,protocolOptions] = parserProtocol(subjectname)

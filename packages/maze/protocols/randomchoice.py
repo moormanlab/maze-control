@@ -282,6 +282,8 @@ class RandomChoiceDelay (MazeProtocols):
     self.addTone(options['toneRight'],duration=options['toneRightDuration'],freq=options['toneRightFrecuency'],volume=options['toneRightVolume'])
     logger.info('Tone {a} asociated with Left at {b} Hz, Volume {c}'.format(a=options['toneLeft'],b=options['toneLeftFrecuency'],c=options['toneLeftVolume']))
     logger.info('Tone {a} asociated with Right at {b} Hz, Volume {c}'.format(a=options['toneRight'],b=options['toneRightFrecuency'],c=options['toneRightVolume']))
+    self.addWhiteNoise(key=3,duration=10.0,volume=1.0)
+    logger.info('White Noise, Volume 1.0')
     time.sleep(.1)
     self.myLastSensor = None
     pass # leave this line in case 'init' is empty
@@ -400,6 +402,9 @@ class RandomChoiceDelay (MazeProtocols):
             self.closeGateFast('IUR')
             #self.openGateFast('OBL')
             self.state='going left'
+            if self.currentTrial=='R':
+              self.playSound(3)
+              logger.info('playing white noise')
             logger.info('reward on left')
           elif self.myLastSensor=='UR':
             logger.info('Rat at {a}'.format(a='UR'))
@@ -409,6 +414,9 @@ class RandomChoiceDelay (MazeProtocols):
             self.closeGateFast('IUL')
             #self.openGateFast('OBR')
             self.state='going right'
+            if self.currentTrial=='L':
+              self.playSound(3)
+              logger.info('playing white noise')
             # check for reward
             logger.info('reward on right')
 
@@ -446,6 +454,7 @@ class RandomChoiceDelay (MazeProtocols):
             #self.openGateFast('OUL')
             #self.openGateFast('OUR')
             self.closeGateFast('IBL')
+            self.stopSound()
             if self.trials[-1][2]==0:
                 self.randomDelay(5,8)
             else:
@@ -487,6 +496,7 @@ class RandomChoiceDelay (MazeProtocols):
             #self.openGateFast('OUL')
             #self.openGateFast('OUR')
             self.closeGateFast('IBR')
+            self.stopSound()
             if self.trials[-1][2]==0:
                 self.randomDelay(5,8)
             else:
