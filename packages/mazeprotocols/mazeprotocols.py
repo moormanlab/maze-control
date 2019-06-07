@@ -77,9 +77,14 @@ class MazeProtocols(object):
   def playSound(self,key):
     self._mazehal.sounds.play(key)
 
+  def stopSound(self):
+    self._mazehal.sounds.stop()
+
   def addTone(self,key,duration=1.0, freq=1000.0, volume=1.0):
     self._mazehal.sounds.addTone(key=key,duration=duration,freq=freq,volume=volume)
 
+  def addWhiteNoise(self,key,duration=1.0, volume=1.0):
+    self._mazehal.sounds.addWhiteNoise(key=key,duration=duration,volume=volume)
 
   ## Sync ##
 
