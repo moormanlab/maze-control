@@ -50,6 +50,7 @@ enum COMMANDS {
   HDMI_ON=16,               // second byte has pin number  0xXXXXABCD A:HDMI1 B:HDMI2 c:HDMI3 d:HDMI4
   HDMI_OFF,                 // second byte has pin number  0xXXXXABCD A:HDMI1 B:HDMI2 c:HDMI3 d:HDMI4
   LED,                      // second byte set state
+  LEDTOGGLE.
   TRAINSTART=32,            //
   TRAINSTOP,                //
   TRIALSTART,               // second byte indicates trial type
@@ -369,19 +370,23 @@ void loop() {
             delayMultiDrop = bufferRX[1]*500;
           break;
         case LED:  // 
-#ifdef DEBUG
-          Serial.print("LED");
-#endif
           if (bufferRX[1]=='H') {
             digitalWrite(trialLed, HIGH);
-#ifdef DEBUG
-            Serial.println("H");
-#endif
           }
           else if (bufferRX[1]=='L') {
             digitalWrite(trialLed, LOW);
+          }
 #ifdef DEBUG
-            Serial.println("L");
+          Serial.print("LED: ");
+          Serial.println(bufferRX[1]);
+#endif
+          break;
+        case LEDTOGGLE:  // 
+          if ((bufferRX[1]>0) and  (bufferRX[1]<=10)) {
+            trialLedToggle(bufferRX[1]);
+#ifdef DEBUG
+            Serial.print("LED Toggle: ");
+            Serial.println(bufferRX[1],DEC);
 #endif
           }
           break;
@@ -414,15 +419,17 @@ void loop() {
           break;
         case TRAINSTOP:
           digitalWrite(hdmi1, LOW);
-          trialLedToggle(5);
+          trialLedToggle(4);
 #ifdef DEBUG
           Serial.println("Training stop");
 #endif
           break;
         case TRIALSTART:
-          trialLedToggle(bufferRX[1]);
+          if (bufferRX[1]=='L') trialLedToggle(2);
+          else if (bufferRX[1]=='R') trialLedToggle(3);
 #ifdef DEBUG
-          Serial.println("Trial");
+          Serial.print("Trial: ");
+          Serial.println(bufferRX[1]);
 #endif
           break;
         case TEST1:
