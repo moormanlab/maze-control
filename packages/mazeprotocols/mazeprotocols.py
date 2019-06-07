@@ -27,7 +27,6 @@ class MazeProtocols(object):
       buttonH = None
     self._mazehal = MazeHal(buttonHandler=buttonH,sensorHandler=sensorH)
     self._mazehal.init()
-    self._mazehal.sync.startTraining()
     self.init(self._options)
     self.run()
    
@@ -87,6 +86,12 @@ class MazeProtocols(object):
   def setSyncTrial(self):
     self._mazehal.sync.startTrial()
 
+  def startTraining(self):
+    self._mazehal.sync.startTraining()
+
+  def stopTraining(self):
+    self._mazehal.sync.stopTraining()
+
   def setSyncH(self,data):
     if type(data) is int:
       if data >=0 and data<=8:
@@ -94,16 +99,16 @@ class MazeProtocols(object):
       else:
         raise ValueError('Bad sync output number')
     elif type(data) is str:
-      if data=='IR':
-        self._mazehal.leds.irOn()
+      if data=='tLed':
+        self._mazehal.leds.tLedOn()
       else:
         raise ValueError('Bad sync output number')
     elif type(data) is list:
       data2 = []
       for i in data:
         if type(i) is str:
-          if i == 'IR':
-            self._mazehal.leds.irOn()
+          if i == 'tLed':
+            self._mazehal.leds.tLedOn()
           else:
             raise ValueError('Bad sync output number')
         else:
@@ -120,16 +125,16 @@ class MazeProtocols(object):
       else:
         raise ValueError('Bad sync output number')
     elif type(data) is str:
-      if data=='IR':
-        self._mazehal.leds.irOff()
+      if data=='tLed':
+        self._mazehal.leds.tLedOff()
       else:
         raise ValueError('Bad sync output number')
     elif type(data) is list:
       data2 = []
       for i in data:
         if type(i) is str:
-          if i == 'IR':
-            self._mazehal.leds.irOff()
+          if i == 'tLed':
+            self._mazehal.leds.tLedOff()
           else:
             raise ValueError('Bad sync output number')
         else:

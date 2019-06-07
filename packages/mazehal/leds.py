@@ -1,7 +1,7 @@
 # Leds control for maze
 # Author: Ariel Burman
 
-LEDSVERSION     = 1.0
+LEDSVERSION     = 1.1
 
 import time
 
@@ -12,7 +12,8 @@ logger = logging.getLogger(__name__)
 ARDUINO_ADDRESS  = 0x60
 
 #register
-IR_LED =        0x12
+TRIAL_LED =        0x12
+TRIAL_LED_TOGGLE = 0x13
 
 class MazeLeds(object):
   def __init__(self, address=ARDUINO_ADDRESS, i2c=None, **kwargs):
@@ -25,13 +26,17 @@ class MazeLeds(object):
     logger.debug('Leds initialized with id %s',id(self))
     logger.info('Leds version {a}'.format(a=LEDSVERSION))
 
-  def irOn(self):
-    logger.debug('IrLED on')
-    self._device.write8(IR_LED,ord('H'))
+  def tLedOn(self):
+    logger.debug('Trial LED on')
+    self._device.write8(TRIAL_LED,ord('H'))
 
-  def irOff(self):
-    logger.debug('IrLED off')
-    self._device.write8(IR_LED,ord('L'))
+  def tLedOff(self):
+    logger.debug('Trial LED off')
+    self._device.write8(TRIAL_LED,ord('L'))
+
+  def tLedToggleN(self,N):
+    logger.debug('Trial LED toggle {a} times'.format(a=N))
+    self._device.write8(TRIAL_LED_TOGGLE,N)
 
 if __name__ == '__main__':
   import sys,os
@@ -48,7 +53,8 @@ if __name__ == '__main__':
   logger.info('Leds Test')
 
   leds=MazeLeds()
-  leds.irOn()
+  leds.tLedOn()
   time.sleep(1)
-  leds.irOff()
+  leds.tLedOff()
   time.sleep(1)
+  leds.tLedToggleN(5)

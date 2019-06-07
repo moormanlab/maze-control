@@ -1,7 +1,7 @@
-# Leds control for maze
+# Signal to I/O sycronization between recording system, video camera, etc.
 # Author: Ariel Burman
 
-SYNCVERSION     = 1.1
+SYNCVERSION     = 1.2
 
 import time
 import gpiozero
@@ -101,6 +101,10 @@ class MazeSyncOut(object):
   def startTraining(self):
     logger.debug('Sending Start Training')
     self._device.writeRaw8(TRAINSTART)
+
+  def stopTraining(self):
+    logger.debug('Sending Stop Training')
+    self._device.writeRaw8(TRAINSTOP)
 
   def endTraining(self):
     logger.debug('Sending End Training')
