@@ -50,7 +50,7 @@ enum COMMANDS {
   HDMI_ON=16,               // second byte has pin number  0xXXXXABCD A:HDMI1 B:HDMI2 c:HDMI3 d:HDMI4
   HDMI_OFF,                 // second byte has pin number  0xXXXXABCD A:HDMI1 B:HDMI2 c:HDMI3 d:HDMI4
   LED,                      // second byte set state
-  LEDTOGGLE.
+  LEDTOGGLE,
   TRAINSTART=32,            //
   TRAINSTOP,                //
   TRIALSTART,               // second byte indicates trial type
