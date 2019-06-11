@@ -108,7 +108,7 @@ class MazeSyncOut(object):
 
   def startTrial(self,trial):
     logger.debug('Sending start Trial, trial type {a}'.format(a=trial))
-    self._device.write(TRIALSTART,trial)
+    self._device.write8(TRIALSTART,ord(trial))
 
 if __name__ == '__main__':
   import sys,os

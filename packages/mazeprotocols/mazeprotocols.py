@@ -125,7 +125,7 @@ class MazeProtocols(object):
     self._sync.startTraining()
 
   def endTraining(self):
-    self._sync.stopTraining()
+    self._sync.endTraining()
 
   def setSyncH(self,data):
     if type(data) is int:
