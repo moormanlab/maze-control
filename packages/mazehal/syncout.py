@@ -102,18 +102,13 @@ class MazeSyncOut(object):
     logger.debug('Sending Start Training')
     self._device.writeRaw8(TRAINSTART)
 
-  def stopTraining(self):
-    logger.debug('Sending Stop Training')
-    self._device.writeRaw8(TRAINSTOP)
-
   def endTraining(self):
     logger.debug('Sending End Training')
     self._device.writeRaw8(TRAINEND)
 
-  def startTrial(self):
-    logger.debug('Sending start Trial')
-    self._device.writeRaw8(TRIALSTART)
-
+  def startTrial(self,trial):
+    logger.debug('Sending start Trial, trial type {a}'.format(a=trial))
+    self._device.write(TRIALSTART,trial)
 
 if __name__ == '__main__':
   import sys,os

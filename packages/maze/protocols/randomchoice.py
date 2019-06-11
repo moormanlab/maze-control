@@ -46,7 +46,7 @@ class RandomChoice (MazeProtocols):
     logger.info('Tone {a} asociated with Right at {b} Hz, Volume {c}'.format(a=options['toneRight'],b=options['toneRightFrecuency'],c=options['toneRightVolume']))
     time.sleep(.1)
     self.myLastSensor = None
-    #self.setSyncH([1])
+    self.setSyncH([1])
     pass # leave this line in case 'init' is empty
 
   def exit(self):
@@ -85,7 +85,6 @@ class RandomChoice (MazeProtocols):
         self.currentTrial = 'R'
         
     self.trials.append([self.trialNum, self.currentTrial,0])
-    self.setSyncTrial()
     self.setSyncH(['tLed'])
     self.playSound(nextTone)
     self.trialInit = time.time()
@@ -286,11 +285,12 @@ class RandomChoiceDelay (MazeProtocols):
     logger.info('White Noise, Volume 1.0')
     time.sleep(.1)
     self.myLastSensor = None
+    self.startTraining()
     pass # leave this line in case 'init' is empty
 
   def exit(self):
     # ending protocol. cleanup code. probably loggin stats.
-    self.setSyncL([1])
+    self.endTraining()
     self.printStats()
     logger.info(self.trials)
     print('bye bye')
@@ -324,8 +324,7 @@ class RandomChoiceDelay (MazeProtocols):
         self.currentTrial = 'R'
         
     self.trials.append([self.trialNum, self.currentTrial,0])
-    self.setSyncTrial()
-    self.setSyncH(['tLed'])
+    self.setSyncTrial(self.currentTrial)
     self.playSound(nextTone)
     self.trialInit = time.time()
     if nextTone==1:
@@ -337,7 +336,6 @@ class RandomChoiceDelay (MazeProtocols):
       time.sleep(.05)
       self.setSyncL([3,8])
     time.sleep(.05)
-    self.setSyncL(['tLed'])
 
     logger.info('Played tone {a} trialNum {b}'.format(a=nextTone,b=self.trialNum))
     self.trialsCount[self.currentTrial] +=1

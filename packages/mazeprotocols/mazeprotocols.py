@@ -116,8 +116,10 @@ class MazeProtocols(object):
 
   ## Sync ##
 
-  def setSyncTrial(self):
-    self._sync.startTrial()
+  def setSyncTrial(self,trial=None):
+    if trial==None:
+        trial='N'
+    self._sync.startTrial(trial)
 
   def startTraining(self):
     self._sync.startTraining()

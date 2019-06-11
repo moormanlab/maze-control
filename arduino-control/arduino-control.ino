@@ -1,5 +1,5 @@
 ///////////////////////////////////////////////////////////////////////////////
-// Arduino control for rat maze - V 1.3  2019/06/07
+// Arduino control for rat maze - V 1.3  2019/06/11
 ///////////////////////////////////////////////////////////////////////////////
 #define VERSIONMAY    1
 #define VERSIONMIN    3
@@ -52,7 +52,7 @@ enum COMMANDS {
   LED,                      // second byte set state
   LEDTOGGLE,
   TRAINSTART=32,            //
-  TRAINSTOP,                //
+  TRAINEND,                 //
   TRIALSTART,               // second byte indicates trial type
   TEST1=90,                 // 0x5a 01011010
   TEST2=165                 // 0xa5 10100101
@@ -417,7 +417,7 @@ void loop() {
           Serial.println("Training start");
 #endif
           break;
-        case TRAINSTOP:
+        case TRAINEND:
           digitalWrite(hdmi1, LOW);
           trialLedToggle(4);
 #ifdef DEBUG
@@ -427,6 +427,7 @@ void loop() {
         case TRIALSTART:
           if (bufferRX[1]=='L') trialLedToggle(2);
           else if (bufferRX[1]=='R') trialLedToggle(3);
+          else if (bufferRX[1]=='N') trialLedToggle(1);
 #ifdef DEBUG
           Serial.print("Trial: ");
           Serial.println(bufferRX[1]);
