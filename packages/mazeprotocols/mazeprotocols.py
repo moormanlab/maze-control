@@ -7,7 +7,9 @@ import time
 import signal,sys
 import logging
 logger=logging.getLogger(__name__)
-from mazehal import MazeHal
+from multiprocessing import Process
+from mazehal import MazeValves, MazeGates, MazeButtons, MazeSensors, MazeSounds, MazeLeds, MazeSyncOut
+
 
 class MazeProtocols(object):
   def __init__(self,options=None):
@@ -16,25 +18,51 @@ class MazeProtocols(object):
     self._options = options
 
   def _run(self):
-    if 'sensorHandler' in dir(self):
-      sensorH = self.sensorHandler
-    else:
-      sensorH = None
-
-    if 'buttonHandler' in dir(self):
-      buttonH = self.buttonHandler
-    else:
-      buttonH = None
-    self._mazehal = MazeHal(buttonHandler=buttonH,sensorHandler=sensorH)
-    self._mazehal.init()
-    self.init(self._options)
-    self.run()
+    try:
+      if 'sensorHandler' in dir(self):
+        sensorH = self.sensorHandler
+      else:
+        sensorH = None
+     
+      if 'buttonHandler' in dir(self):
+        buttonH = self.buttonHandler
+      else:
+        buttonH = None
+     
+      self._valves = MazeValves()
+      self._buttons = MazeButtons(buttonH)
+      self._sensors = MazeSensors(sensorH)
+      self._sounds = MazeSounds()
+      self._leds = MazeLeds()
+      self._sync = MazeSyncOut()
+      self._gates = MazeGates()
+      self._gatesP=Process(target=self._gates.run)
+      self._gatesP.start()
+      self._sync.setLow([1])
+      self._sync.setLow([2])
+      self._sync.setLow([3])
+      self._sync.setLow([4])
+      self._sync.setLow([5])
+      self._sync.setLow([6])
+      self._sync.setLow([7])
+      self._sync.setLow([8])
+      self._buttons.setLedOff('B')
+      self._buttons.setLedOff('Y')
+      self._buttons.setLedOff('W')
+      self._buttons.setLedOff('G')
+      self.init(self._options)
+      self.run()
+    except Exception as e:
+      logger.error(e)
+      print('error in mazeprotocol')
+      print(e)
+    
    
   def __exit_gracefully(self,a,b):
     print('Exiting MazeProtocol')
-    self._mazehal.sync.endTraining()
+    self._sync.endTraining()
+    self._gates.exit()
     self.exit()
-    self._mazehal.exit()
     sys.exit()
 
   ## Buttons ##
@@ -42,70 +70,70 @@ class MazeProtocols(object):
   ## Sensors ##
 
   def getLastSensorActive(self):
-    return self._mazehal.sensors.getLastSensorActive()
+    return self._sensors.getLastSensorActive()
 
   def isSensorActive(self,key):
-    return self._mazehal.sensors.isPressed(key)
+    return self._sensors.isPressed(key)
 
   ## Valves ####
 
   def drop(self,key):
-    self._mazehal.valves.drop(key)
+    self._valves.drop(key)
 
   def multiDrop(self,key):
-    self._mazehal.valves.multiDrop(key)
+    self._valves.multiDrop(key)
 
   def setMultiDrop(self,num):
-    self._mazehal.valves.setMultidropsNum(num)  
+    self._valves.setMultidropsNum(num)  
 
   ## Gates ##
 
   def openGate(self,key):
-    self._mazehal.gates.openGate(key)
+    self._gates.openGate(key)
 
   def closeGate(self,key):
-    self._mazehal.gates.closeGate(key)
+    self._gates.closeGate(key)
 
   def openGateFast(self,key):
-    self._mazehal.gates.openGateFast(key)
+    self._gates.openGateFast(key)
 
   def closeGateFast(self,key):
-    self._mazehal.gates.closeGateFast(key)
+    self._gates.closeGateFast(key)
 
   ## Sounds ##
 
   def playSound(self,key):
-    self._mazehal.sounds.play(key)
+    self._sounds.play(key)
 
   def stopSound(self):
-    self._mazehal.sounds.stop()
+    self._sounds.stop()
 
   def addTone(self,key,duration=1.0, freq=1000.0, volume=1.0):
-    self._mazehal.sounds.addTone(key=key,duration=duration,freq=freq,volume=volume)
+    self._sounds.addTone(key=key,duration=duration,freq=freq,volume=volume)
 
   def addWhiteNoise(self,key,duration=1.0, volume=1.0):
-    self._mazehal.sounds.addWhiteNoise(key=key,duration=duration,volume=volume)
+    self._sounds.addWhiteNoise(key=key,duration=duration,volume=volume)
 
   ## Sync ##
 
   def setSyncTrial(self):
-    self._mazehal.sync.startTrial()
+    self._sync.startTrial()
 
   def startTraining(self):
-    self._mazehal.sync.startTraining()
+    self._sync.startTraining()
 
-  def stopTraining(self):
-    self._mazehal.sync.stopTraining()
+  def endTraining(self):
+    self._sync.stopTraining()
 
   def setSyncH(self,data):
     if type(data) is int:
       if data >=0 and data<=8:
-        self._mazehal.sync.setHigh([data])
+        self._sync.setHigh([data])
       else:
         raise ValueError('Bad sync output number')
     elif type(data) is str:
       if data=='tLed':
-        self._mazehal.leds.tLedOn()
+        self._leds.tLedOn()
       else:
         raise ValueError('Bad sync output number')
     elif type(data) is list:
@@ -113,7 +141,7 @@ class MazeProtocols(object):
       for i in data:
         if type(i) is str:
           if i == 'tLed':
-            self._mazehal.leds.tLedOn()
+            self._leds.tLedOn()
           else:
             raise ValueError('Bad sync output number')
         else:
@@ -121,17 +149,17 @@ class MazeProtocols(object):
             data2.append(i)
           else:
             raise ValueError('Bad sync output number')
-      self._mazehal.sync.setHigh(data2)
+      self._sync.setHigh(data2)
 
   def setSyncL(self,data):
     if type(data) is int:
       if data >=0 and data<=8:
-        self._mazehal.sync.setLow([data])
+        self._sync.setLow([data])
       else:
         raise ValueError('Bad sync output number')
     elif type(data) is str:
       if data=='tLed':
-        self._mazehal.leds.tLedOff()
+        self._leds.tLedOff()
       else:
         raise ValueError('Bad sync output number')
     elif type(data) is list:
@@ -139,7 +167,7 @@ class MazeProtocols(object):
       for i in data:
         if type(i) is str:
           if i == 'tLed':
-            self._mazehal.leds.tLedOff()
+            self._leds.tLedOff()
           else:
             raise ValueError('Bad sync output number')
         else:
@@ -147,5 +175,5 @@ class MazeProtocols(object):
             data2.append(i)
           else:
             raise ValueError('Bad sync output number')
-      self._mazehal.sync.setLow(data2)
+      self._sync.setLow(data2)
 

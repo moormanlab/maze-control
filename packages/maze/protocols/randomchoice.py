@@ -86,7 +86,7 @@ class RandomChoice (MazeProtocols):
         
     self.trials.append([self.trialNum, self.currentTrial,0])
     self.setSyncTrial()
-    self.setSyncH(['IR'])
+    self.setSyncH(['tLed'])
     self.playSound(nextTone)
     self.trialInit = time.time()
     if nextTone==1:
@@ -98,7 +98,7 @@ class RandomChoice (MazeProtocols):
       time.sleep(.05)
       self.setSyncL([3,8])
     time.sleep(.05)
-    self.setSyncL(['IR'])
+    self.setSyncL(['tLed'])
 
     logger.info('Played tone {a} trialNum {b}'.format(a=nextTone,b=self.trialNum))
     self.trialsCount[self.currentTrial] +=1
@@ -138,6 +138,7 @@ class RandomChoice (MazeProtocols):
       self.trialNum = 0
       # waiting to rat to pass the sensor
       #while self.getLastSensorActive()!='C':
+      self.timeInitTraining = time.time()
       while self.myLastSensor is not 'C':
           time.sleep(.1)
           pass
@@ -244,9 +245,8 @@ class RandomChoice (MazeProtocols):
 
     except Exception as e:
       logger.error(e)
+      print('Error in Protocol Program')
       print(e)
-
-
 
 
 
@@ -325,7 +325,7 @@ class RandomChoiceDelay (MazeProtocols):
         
     self.trials.append([self.trialNum, self.currentTrial,0])
     self.setSyncTrial()
-    self.setSyncH(['IR'])
+    self.setSyncH(['tLed'])
     self.playSound(nextTone)
     self.trialInit = time.time()
     if nextTone==1:
@@ -337,7 +337,7 @@ class RandomChoiceDelay (MazeProtocols):
       time.sleep(.05)
       self.setSyncL([3,8])
     time.sleep(.05)
-    self.setSyncL(['IR'])
+    self.setSyncL(['tLed'])
 
     logger.info('Played tone {a} trialNum {b}'.format(a=nextTone,b=self.trialNum))
     self.trialsCount[self.currentTrial] +=1

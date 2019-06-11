@@ -91,12 +91,9 @@ class TrueButton(object):
             else:
               self.button[int(l[0])] = True
         except Exception as e:
-          print('Exception in gpiozero module Truebutton')
           logger.error('Exception in gpiozero module Truebutton')
           logger.error(e)
-        #finally:
-          #print('se termino el principal')
-        time.sleep(.5)
+        time.sleep(.25)
 
   __instance = None
   __num = 0
