@@ -238,12 +238,12 @@ def main(argv=None):
   
   loglevel=logging.INFO
   dateformat = '%H:%M:%S'
-  formatter_str = '%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s'
+  formatter_str = '%(asctime)s.%(msecs)03d;%(name)s;%(levelname)s;%(message)s'
   try:
     if argv[2]=='--debug':
       print('Loggin DEBUG mode')
-      formatter_str = '%(asctime)s.%(msecs)03d - %(name)-20s - %(levelname)-7s - p%(process)s{%(filename)-15s:%(lineno)4d}-%(message)s'
-      loglevel=loggin.DEBUG
+      formatter_str = '%(asctime)s.%(msecs)03d;%(name)s;%(levelname)s;p%(process)s{%(filename)s:%(lineno)d};%(message)s'
+      loglevel=logging.DEBUG
   except:
     pass
 

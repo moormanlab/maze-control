@@ -3,11 +3,11 @@
 
 from mazeprotocols import MazeProtocols
 import time
+import logging
 
 PROTOCOL_NAME= 'BlockChoice'
 PROTOCOL_VERSION = '1.6'
 
-import logging
 logger=logging.getLogger(PROTOCOL_NAME)
 
 import numpy as np
@@ -296,9 +296,9 @@ class BlockChoiceDelay (MazeProtocols):
     self.openGateFast('OUL')
     self.openGateFast('OUR')
     self.openGateFast('OBL') # maybe closed
-    self.openGateFast('OBR') # maybe closed
+    self.closeGateFast('OBR') # maybe closed
     self.closeGateFast('IBL')
-    self.closeGateFast('IBR')
+    self.openGateFast('IBR')
     self.trialNum = 0
     self.rewardDone = False
     self.timeInitTraining = 0
@@ -311,16 +311,18 @@ class BlockChoiceDelay (MazeProtocols):
     self.addTone(options['toneRight'],duration=options['toneRightDuration'],freq=options['toneRightFrecuency'],volume=options['toneRightVolume'])
     logger.info('Tone {a} asociated with Left at {b} Hz, Volume {c}'.format(a=options['toneLeft'],b=options['toneLeftFrecuency'],c=options['toneLeftVolume']))
     logger.info('Tone {a} asociated with Right at {b} Hz, Volume {c}'.format(a=options['toneRight'],b=options['toneRightFrecuency'],c=options['toneRightVolume']))
+    self.addWhiteNoise(key=3,duration=10.0,volume=1.0)
+    logger.info('White Noise, Volume 1.0')
     time.sleep(.1)
     self.myLastSensor = None
-    #self.setSyncH([1])
+    self.startTraining()
     pass # leave this line in case 'init' is empty
 
   def exit(self):
     # ending protocol. cleanup code. probably loggin stats.
-    self.printStats()
     logger.info(self.trials)
     self.endTraining()
+    self.printStats()
     print('bye bye')
     pass # leave this line in case 'exit' is empty
 
@@ -411,7 +413,10 @@ class BlockChoiceDelay (MazeProtocols):
     while self.myLastSensor is not 'C':
         time.sleep(.1)
         pass
+    self.closeGateFast('IBR')
+    self.openGateFast('OBR')
     self.timeInitTraining = time.time()
+    time.sleep(10)
     self.startTrial()
     while True:
       self.myFunction(self.state)
@@ -422,15 +427,19 @@ class BlockChoiceDelay (MazeProtocols):
           logger.info('Rat at {a}'.format(a='UL'))
           #the rat went left
           self.closeGateFast('IUR')
-          self.openGateFast('OBL')
           self.state='going left'
+          if self.currentTrial=='R':
+            self.playSound(3)
+            logger.info('playing white noise')
           logger.info('reward on left')
         elif self.myLastSensor=='UR':
           logger.info('Rat at {a}'.format(a='UR'))
           #the rat went right
           self.closeGateFast('IUL')
-          self.openGateFast('OBR')
           self.state='going right'
+          if self.currentTrial=='L':
+            self.playSound(3)
+            logger.info('playing white noise')
           # check for reward
           logger.info('reward on right')
 
@@ -463,6 +472,7 @@ class BlockChoiceDelay (MazeProtocols):
         if self.myLastSensor=='C':
           logger.info('Rat at {a}'.format(a='C'))
           self.closeGateFast('IBL')
+          self.stopSound()
           self.startTrial()
           self.state = 'start'
 
@@ -496,6 +506,7 @@ class BlockChoiceDelay (MazeProtocols):
         if self.myLastSensor=='C':
           logger.info('Rat at {a}'.format(a='C'))
           self.closeGateFast('IBR')
+          self.stopSound()
           self.startTrial()
           self.state = 'start'
 

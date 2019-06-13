@@ -1,10 +1,8 @@
 # Example protocol for maze training
 # Author: Ariel Burman
 
-
 from mazeprotocols import MazeProtocols
 import time
-
 import logging
 
 PROTOCOL_NAME= 'RandomChoice'
