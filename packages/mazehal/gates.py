@@ -8,7 +8,7 @@ from multiprocessing import Process, Queue, Lock, Value
 from ctypes import c_bool,c_int
 
 import logging
-logger=logging.getLogger(__name__)
+logger=logging.getLogger('MazeGates')
 
 import adai2c as pwm
 
@@ -118,7 +118,7 @@ class Gate(object):
       self.motor.setPosition(0) #was after
       logger.debug('gate %s position after = %s',self.name,self.motor.getPosition())
     except Exception as e:
-      print (e)
+      logger.error(e)
       self.lock.release()
     finally:
       logger.debug('ended move Slow %s',self.name)
@@ -137,7 +137,7 @@ class Gate(object):
       self.motor.setPosition(0) #was after
       logger.debug('gate %s position after = %s',self.name,self.motor.getPosition())
     except Exception as e:
-      print (e)
+      logger.error(e)
       self.lock.release()
     finally:
       logger.debug('ended move Fast %s',self.name)
@@ -273,8 +273,6 @@ class MazeGates(object):
         else:
           raise NameError('Messege not implemented')
         p.start()
-#        print(id(p))
-#        self.processrunning.append(p)
 
       msg = "Moving: "
       for key in self.gate:

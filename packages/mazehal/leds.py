@@ -6,7 +6,7 @@ LEDSVERSION     = 1.1
 import time
 
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('MazeLeds')
 
 # Registers/etc:
 ARDUINO_ADDRESS  = 0x60

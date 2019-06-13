@@ -7,7 +7,7 @@ import time
 import gpiozero
 
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('MazeSync')
 
 # Registers/etc:
 ARDUINO_ADDRESS  = 0x60

@@ -11,7 +11,7 @@ from multiprocessing import Process, Queue
 
 from mazeprotocols import MazeProtocols
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('Maze')
 
 def check_module(module_name):
   """
@@ -207,6 +207,7 @@ class Maze(object):
   def exit(self):
     logger.warning('Exiting')
     self.protocolP.terminate()
+    time.sleep(.2)
     sys.exit()
 
 def main(argv=None):
@@ -216,8 +217,6 @@ def main(argv=None):
       exit(1)
   if not os.path.exists('./logs/'):
     os.makedirs('./logs/')
-  dateformat = '%H:%M:%S'
-  formatter_str = '%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s'
 
   try:
     subjectname = argv[1]
@@ -238,8 +237,12 @@ def main(argv=None):
         raise NameError('Too many sessions in one day')
   
   loglevel=logging.INFO
+  dateformat = '%H:%M:%S'
+  formatter_str = '%(asctime)s.%(msecs)03d - %(name)s - %(levelname)s - %(message)s'
   try:
     if argv[2]=='--debug':
+      print('Loggin DEBUG mode')
+      formatter_str = '%(asctime)s.%(msecs)03d - %(name)-20s - %(levelname)-7s - p%(process)s{%(filename)-15s:%(lineno)4d}-%(message)s'
       loglevel=loggin.DEBUG
   except:
     pass
@@ -259,7 +262,6 @@ def main(argv=None):
     print(inst)
     logger.exeption('Exception ocurred')
     logger.error(inst.args)
-
 
 
 if __name__ == '__main__':

@@ -7,7 +7,7 @@ import time
 
 import traceback
 import logging
-logger=logging.getLogger(__name__)
+logger=logging.getLogger('MazeSensors')
 
 import gpiozero
 

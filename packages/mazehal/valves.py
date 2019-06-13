@@ -6,7 +6,7 @@ VALVEVERSION     = 1.0
 import time
 
 import logging
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('MazeValves')
 
 # Registers/etc:
 ARDUINO_ADDRESS  = 0x60

@@ -7,7 +7,7 @@ import numpy as np
 import simpleaudio as sa
 
 import logging
-logger=logging.getLogger(__name__)
+logger=logging.getLogger('MazeSounds')
 
 # using 16 bit sounds
 # pi audio is a one instance class with multiple types of sounds

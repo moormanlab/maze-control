@@ -6,10 +6,10 @@ PROTOCOLSVERSION = 1.5
 import time
 import signal,sys
 import logging
-logger=logging.getLogger(__name__)
+logger=logging.getLogger('MazeProtocols')
 from multiprocessing import Process
 from mazehal import MazeValves, MazeGates, MazeButtons, MazeSensors, MazeSounds, MazeLeds, MazeSyncOut
-
+import traceback
 
 class MazeProtocols(object):
   def __init__(self,options=None):
@@ -53,16 +53,15 @@ class MazeProtocols(object):
       self.init(self._options)
       self.run()
     except Exception as e:
-      logger.error(e)
-      print('error in mazeprotocol')
-      print(e)
+      print('Error in mazeprotocol')
+      logger.error(traceback.format_exc())
     
    
   def __exit_gracefully(self,a,b):
     print('Exiting MazeProtocol')
-    self._sync.endTraining()
     self._gates.exit()
     self.exit()
+    time.sleep(.1)
     sys.exit()
 
   ## Buttons ##
@@ -108,6 +107,9 @@ class MazeProtocols(object):
   def stopSound(self):
     self._sounds.stop()
 
+  def isSoundPlaying(self):
+    self._sounds.isPlaying()
+
   def addTone(self,key,duration=1.0, freq=1000.0, volume=1.0):
     self._sounds.addTone(key=key,duration=duration,freq=freq,volume=volume)
 
@@ -120,12 +122,15 @@ class MazeProtocols(object):
     if trial==None:
         trial='N'
     self._sync.startTrial(trial)
+    logger.debug('Syncing trial {a}'.format(a=trial))
 
   def startTraining(self):
     self._sync.startTraining()
+    logger.debug('Start Training')
 
   def endTraining(self):
     self._sync.endTraining()
+    logger.debug('End Training')
 
   def setSyncH(self,data):
     if type(data) is int:
