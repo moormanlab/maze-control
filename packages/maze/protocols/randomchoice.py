@@ -6,10 +6,10 @@ from mazeprotocols import MazeProtocols
 import time
 
 import logging
-logger=logging.getLogger(__name__)
 
 PROTOCOL_NAME= 'RandomChoice'
 PROTOCOL_VERSION = '1.2'
+logger=logging.getLogger(PROTOCOL_NAME)
 
 import numpy as np
 
@@ -17,6 +17,20 @@ class RandomChoice (MazeProtocols):
   def init(self,options):
     # initialization
     # put here the code you want to run only once, at first
+    """ options needed 
+        multidropNum  integer
+        rewardWindow  float
+       
+        # Stimulus
+        toneLeft             integer
+        toneLeftFrecuency    integer
+        toneLeftVolume       float 0.0 to 1.0
+        toneLeftDuration     float
+        toneRight            integer
+        toneRightFrecuency   integer
+        toneRightVolume      float 0.0 to 1.0
+        toneRightDuration    float
+    """
     logger.info('Protocol: {a}, Version: {b}'.format(a=PROTOCOL_NAME,b=PROTOCOL_VERSION))
     self.rewardWindow = options['rewardWindow']
     logger.info('Reward Window: {a}'.format(a=self.rewardWindow))
@@ -253,6 +267,20 @@ class RandomChoiceDelay (MazeProtocols):
   def init(self,options):
     # initialization
     # put here the code you want to run only once, at first
+    """ options needed 
+        multidropNum  integer
+        rewardWindow  float
+       
+        # Stimulus
+        toneLeft             integer
+        toneLeftFrecuency    integer
+        toneLeftVolume       float 0.0 to 1.0
+        toneLeftDuration     float
+        toneRight            integer
+        toneRightFrecuency   integer
+        toneRightVolume      float 0.0 to 1.0
+        toneRightDuration    float
+    """
     logger.info('Protocol: {a}, Version: {b}'.format(a=PROTOCOL_NAME,b=PROTOCOL_VERSION))
     logger.info('With random intertrial delay:')
     self.rewardWindow = options['rewardWindow']
@@ -395,10 +423,7 @@ class RandomChoiceDelay (MazeProtocols):
           if self.myLastSensor=='UL':
             logger.info('Rat at {a}'.format(a='UL'))
             #the rat went left
-            #self.closeGateFast('IBL')
-            #self.closeGateFast('IBR')
             self.closeGateFast('IUR')
-            #self.openGateFast('OBL')
             self.state='going left'
             if self.currentTrial=='R':
               self.playSound(3)
@@ -407,10 +432,7 @@ class RandomChoiceDelay (MazeProtocols):
           elif self.myLastSensor=='UR':
             logger.info('Rat at {a}'.format(a='UR'))
             #the rat went right
-            #self.closeGateFast('IBL')
-            #self.closeGateFast('IBR')
             self.closeGateFast('IUL')
-            #self.openGateFast('OBR')
             self.state='going right'
             if self.currentTrial=='L':
               self.playSound(3)
@@ -441,16 +463,12 @@ class RandomChoiceDelay (MazeProtocols):
         elif self.state == 'reward left':
           if self.myLastSensor=='BL':
             logger.info('Rat at {a}'.format(a='BL'))
-            #self.closeGateFast('OUL')
             self.state = 'returning left'
 
 
         elif self.state == 'returning left':
           if self.myLastSensor=='C':
             logger.info('Rat at {a}'.format(a='C'))
-            #self.closeGateFast('OBL')
-            #self.openGateFast('OUL')
-            #self.openGateFast('OUR')
             self.closeGateFast('IBL')
             self.stopSound()
             if self.trials[-1][2]==0:
@@ -484,15 +502,11 @@ class RandomChoiceDelay (MazeProtocols):
         elif self.state == 'reward right':
           if self.myLastSensor=='BR':
             logger.info('Rat at {a}'.format(a='BR'))
-            #self.closeGateFast('OUR')
             self.state = 'returning right'
 
         elif self.state == 'returning right':
           if self.myLastSensor=='C':
             logger.info('Rat at {a}'.format(a='C'))
-            #self.closeGateFast('OBR')
-            #self.openGateFast('OUL')
-            #self.openGateFast('OUR')
             self.closeGateFast('IBR')
             self.stopSound()
             if self.trials[-1][2]==0:
