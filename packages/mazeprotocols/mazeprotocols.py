@@ -108,7 +108,7 @@ class MazeProtocols(object):
     self._sounds.stop()
 
   def isSoundPlaying(self):
-    self._sounds.isPlaying()
+    return self._sounds.isPlaying()
 
   def addTone(self,key,duration=1.0, freq=1000.0, volume=1.0):
     self._sounds.addTone(key=key,duration=duration,freq=freq,volume=volume)

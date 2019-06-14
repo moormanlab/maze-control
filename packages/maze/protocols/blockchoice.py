@@ -101,7 +101,7 @@ class BlockChoice (MazeProtocols):
         self.currentTrial = 'R'
         
     self.trials.append([self.trialNum, self.currentTrial,0])
-    self.setSyncTrial()
+    self.setSyncTrial(nextTone)
     self.playSound(nextTone)
     self.trialInit = time.time()
     if nextTone==1:
@@ -111,7 +111,7 @@ class BlockChoice (MazeProtocols):
 
     logger.info('Played tone {a} trialNum {b}'.format(a=nextTone,b=self.trialNum))
     self.trialsCount[self.currentTrial] +=1
-    while self.isSensorActive()==True:
+    while self.isSoundPlaying()==True:
         time.sleep(.2)
     if nextTone==1:
       self.setSyncL([2,7])
@@ -355,7 +355,7 @@ class BlockChoiceDelay (MazeProtocols):
         self.currentTrial = 'R'
 
     self.trials.append([self.trialNum, self.currentTrial,0])
-    self.setSyncTrial()
+    self.setSyncTrial(self.currentTrial)
     self.playSound(nextTone)
     self.trialInit = time.time()
     if nextTone==1:

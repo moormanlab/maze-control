@@ -17,30 +17,31 @@ class MazeSounds():
     self.sound = {}
     self.play_obj = None
     logger.debug('Maze Sounds id %s ',id(self))
-    logger.info('Sounds version {a}'.format(a=SOUNDSVERSION))
+    logger.debug('Sounds version {a}'.format(a=SOUNDSVERSION))
 
   def play(self,key):
     self.play_obj = self.sound[key].play()
-    logger.info('play audio %s',key)
+    logger.debug('play audio %s',key)
 
   def stop(self):
     if self.isPlaying():
       self.play_obj.stop()
-      logger.info('stop current sound')
+      logger.debug('stop current sound')
     
   def playBlocking(self,key):
     self.play_obj = self.sound[key].play()
-    logger.info('play audio %s',key)
+    logger.debug('play audio %s',key)
     self.play_obj.wait_done()
 
   def isPlaying(self):
     if self.play_obj is None:
+        logger.debug('No object defined')
         return False
     else:
         return self.play_obj.is_playing()
 
   def addTone(self,key,duration=1.0, freq=1000.0, volume=1.0, sample_rate = 44100):
-    logger.info('Sound %s : Tone freq = %s Hz, duration = %s s, sample_rate = %s, volume = %s',key,freq,duration,sample_rate,volume)
+    logger.debug('Sound %s : Tone freq = %s Hz, duration = %s s, sample_rate = %s, volume = %s',key,freq,duration,sample_rate,volume)
   
     # get timesteps for each sample, T is note duration in seconds
     T = duration
@@ -62,7 +63,7 @@ class MazeSounds():
        buff should be a numpy array of np.int16 
        with one or two dimensions (mono or stereo)
     '''
-    logger.info('Custom sound channels %s',len(buff))
+    logger.debug('Custom sound channels %s',len(buff))
     # convert to 16-bit data
     buff = buff.astype(np.int16)
     if len(buff)==2:
@@ -73,7 +74,7 @@ class MazeSounds():
     logger.debug(str(buff))
 
   def addWhiteNoise(self,key,duration=5.0,volume=1.0, sample_rate = 44100):
-    logger.info('Sound %s : White noise random generated, duration = %s s, sample_rate = %s, volume = %s',key,duration,sample_rate,volume)
+    logger.debug('Sound %s : White noise random generated, duration = %s s, sample_rate = %s, volume = %s',key,duration,sample_rate,volume)
     noise = np.random.normal(0,1,round(duration*sample_rate))
     noise *= 32767 * volume /np.max(np.abs(noise))
     noise = noise.astype(np.int16)
@@ -95,8 +96,8 @@ if __name__=='__main__':
 
   sample_rate = 44100
   audio = MazeSounds()
-  audio.addTone(key=1,duration=3.0,freq=1000.0,volume=0.5,sample_rate=sample_rate)
-  audio.addTone(key=2,duration=3.0,freq=8000.0,volume=1.0,sample_rate=sample_rate)
+  audio.addTone(key=1,duration=3.0,freq=1000.0,volume=0.1,sample_rate=sample_rate)
+  audio.addTone(key=2,duration=3.0,freq=8000.0,volume=0.1,sample_rate=sample_rate)
   
   import time
   t = np.linspace(0, 2.0, int(2.0 * sample_rate), False)
@@ -115,12 +116,13 @@ if __name__=='__main__':
   audio.playBlocking(2)
   time.sleep(2)
   print(audio.isPlaying())
-#  audio.play(3)
-#  print(audio.isPlaying())
-#  audio.play_obj.wait_done()
+  audio.play(3)
+  print(audio.isPlaying())
+  while audio.isPlaying()==True:
+      print('waiting to finish')
+      time.sleep(.1)
 
-
-  audio.addWhiteNoise(key=4,duration=3.0,volume=1.0,sample_rate=sample_rate)
+  audio.addWhiteNoise(key=4,duration=3.0,volume=0.1,sample_rate=sample_rate)
   audio.play(4)
   time.sleep(4)
   print(audio.isPlaying())
