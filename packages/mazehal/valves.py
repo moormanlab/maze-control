@@ -44,7 +44,7 @@ class MazeValves(object):
     self.dropdelay = 50
     self.multidropdelay = 2 # multiple of 500 ms (2 means 1 seconds)
     logger.debug('Valves initialized with id %s',id(self))
-    logger.info('Valves version {a}'.format(a=VALVEVERSION))
+    logger.debug('Valves version {a}'.format(a=VALVEVERSION))
 
   def open(self,key):
     logger.debug('Open valve {a}'.format(a=key))

@@ -167,7 +167,7 @@ class Gate(object):
 
 class MazeGates(object):
   def __init__(self):
-    # Initialise the PCA9685 using the default address (0x40).
+    # Initialize the PCA9685 using the default address (0x40).
     # Set frequency to 60hz, good for servos.
     self.gate = {}
     self.queue = Queue()
@@ -177,7 +177,7 @@ class MazeGates(object):
                 openGoal=pwmV[key][1][0],openAfter=pwmV[key][1][1],
                 closeGoal=pwmV[key][1][2],closeAfter=pwmV[key][1][3])
     logger.debug('Maze Gates id %s ',id(self))
-    logger.info('Gates version {a}'.format(a=GATEVERSION))
+    logger.debug('Gates version {a}'.format(a=GATEVERSION))
 
   def _emptyQ(self):
     while self.queue.empty() is not True:
@@ -252,7 +252,7 @@ class MazeGates(object):
 
   def run(self):
     while True:
-#      for p in self.proccess:
+#      for p in self.process:
 #        if p.
       
 
@@ -260,7 +260,7 @@ class MazeGates(object):
         data = self.queue.get()
         logger.debug('new data %s',data)
         if data[0] == 'exit':
-          logger.info('Exiting Gates Process')
+          logger.debug('Exiting Gates Process')
           break
         elif data[0] == 'of':
           p = Process(target=self.gate[data[1]].openGateFast)
@@ -271,7 +271,7 @@ class MazeGates(object):
         elif data[0] == 'cs':
           p = Process(target=self.gate[data[1]].closeGate)
         else:
-          raise NameError('Messege not implemented')
+          raise NameError('Message not implemented')
         p.start()
 
       msg = "Moving: "
@@ -319,7 +319,7 @@ if __name__ == '__main__':
 #    gates.closeGateFast('IUL')
 #    time.sleep(1.5)
 #
-#    logger.info('Gates Clossing')
+#    logger.info('Gates Closing')
     gates.closeAll()
     time.sleep(1.5)
     gates.openGateFast('IUL')

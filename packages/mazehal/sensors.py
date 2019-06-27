@@ -57,7 +57,7 @@ class MazeSensors(object):
       self.sensor[key].setWhenPressed(self._sensorsHandler)
 
     logger.debug('MazeSensors id %s ',id(self))
-    logger.info('Sensors version {a}'.format(a=SENSORVERSION))
+    logger.debug('Sensors version {a}'.format(a=SENSORVERSION))
     logger.debug('Using handler {a}'.format(a=handler))
 
   def _sensorsHandler(self,sensorObj):

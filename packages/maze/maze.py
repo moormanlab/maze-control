@@ -20,10 +20,10 @@ def check_module(module_name):
   """
   module_spec = util.find_spec(module_name)
   if module_spec is None:
-      logger.info('Module: {} not found'.format(module_name))
+      logger.debug('Module: {} not found'.format(module_name))
       return None
   else:
-      logger.info('Module: {} can be imported!'.format(module_name))
+      logger.debug('Module: {} can be imported!'.format(module_name))
       return module_spec
 
 def printhelp():

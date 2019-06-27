@@ -21,7 +21,7 @@ class AdaI2C(object):
       self.pwm.set_pwm_freq(60)
       self.lock = Lock()
       logger.debug('Initializing adai2c with id %s',id(self))
-      logger.info('AdaI2C version {a}'.format(a=ADAVERSION))
+      logger.debug('AdaI2C version {a}'.format(a=ADAVERSION))
       
     def set(self,number,pwm):
       logger.debug("setting pwm %s, with value %s, id %s",number,pwm,id(self))

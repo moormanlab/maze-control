@@ -82,7 +82,7 @@ class MazeSyncOut(object):
         self.syncOut[key] = SyncOutPi(syncouts[key][1])
 
     logger.debug('Sync output initialized with id %s',id(self))
-    logger.info('Sync Output version {a}'.format(a=SYNCVERSION))
+    logger.debug('Sync Output version {a}'.format(a=SYNCVERSION))
 
   def setHigh(self,outputs):
     if len(outputs)>0:

@@ -24,7 +24,7 @@ class MazeLeds(object):
     self._device = i2c.get_i2c_device(address, **kwargs)
     self.leds = {}
     logger.debug('Leds initialized with id %s',id(self))
-    logger.info('Leds version {a}'.format(a=LEDSVERSION))
+    logger.debug('Leds version {a}'.format(a=LEDSVERSION))
 
   def tLedOn(self):
     logger.debug('Trial LED on')

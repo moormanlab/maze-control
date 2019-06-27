@@ -14,7 +14,7 @@ import traceback
 class MazeProtocols(object):
   def __init__(self,options=None):
     signal.signal(signal.SIGTERM, self.__exit_gracefully)  
-    logger.info('Maze Protocols version {a}'.format(a=PROTOCOLSVERSION))
+    logger.debug('Maze Protocols version {a}'.format(a=PROTOCOLSVERSION))
     self._options = options
 
   def _run(self):

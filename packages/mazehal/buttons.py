@@ -21,7 +21,7 @@ buttons = {'B':[12,15,'blue'],
 
 class ledButton(object):
   def __init__(self,gpioN=0,ledN=0,color=''):
-    logger.info('Button connected to gpio %s with led %s is color %s id %s ',gpioN,ledN,color,id(self))
+    logger.debug('Button connected to gpio %s with led %s is color %s id %s ',gpioN,ledN,color,id(self))
     self.button=gpiozero.Button(gpioN,pull_up=True,bounce_time=0.1,hold_time=1,hold_repeat=False)
     self.button.when_pressed = None
     self.ledN=ledN
@@ -60,7 +60,7 @@ class MazeButtons(object):
       self.button[key].setWhenPressed(self._buttonsHandler)
 
     logger.debug('MazeButtons id %s ',id(self))
-    logger.info('Buttons version {a}'.format(a=BUTTONSVERSION))
+    logger.debug('Buttons version {a}'.format(a=BUTTONSVERSION))
 
   def _buttonsHandler(self,buttonObj):
     try:
@@ -78,15 +78,15 @@ class MazeButtons(object):
       print('error handled in button module')
 
   def setLedOn(self,key):
-    logger.info('New Led %s on',self.button[key].color)
+    logger.debug('New Led %s on',self.button[key].color)
     self.button[key].ledOn()
 
   def setLedOff(self,key):
-    logger.info('New Led %s off',self.button[key].color)
+    logger.debug('New Led %s off',self.button[key].color)
     self.button[key].ledOff()
 
   def setLedPwm(self,key,val):
-    logger.info('New Led %s pwm %s',self.button[key].color,val)
+    logger.debug('New Led %s pwm %s',self.button[key].color,val)
     self.button[key].ledPwm(val)
 
   def isPressed(self,key):
