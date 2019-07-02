@@ -107,4 +107,4 @@ venv.bak/
 *.swp
 *.stl
 **/subjects/*.cfg
-**/protocols/*.py
+**/protocols/*
