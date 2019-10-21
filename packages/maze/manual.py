@@ -23,6 +23,7 @@ logger.info('Manual Maze Control')
 
 from mazehal.valves import MazeValves
 from mazehal.gates import MazeGates
+from mazehal.syncout import MazeSyncOut
 import time
 fd = sys.stdin.fileno()
 oldterm = termios.tcgetattr(fd)
@@ -57,6 +58,8 @@ try:
     from multiprocessing import Process
     gates = MazeGates()
     valves = MazeValves()
+    sync = MazeSyncOut()
+    n = 0
     p = Process(target=gates.run)
     p.start()
     printhelp()
@@ -102,6 +105,16 @@ try:
             elif c == 'v':
                 valve = 'R'
                 cmd='drop'
+            elif c == 'j':
+                n+=1
+                if n%2:
+                  sync.startTrial('L')
+                else:
+                  sync.startTrial('R')
+            elif c == 'k':
+                sync.startTraining()
+            elif c == 'l':
+                sync.endTraining()
             elif c == '?' or c == 'h':
                 printhelp()
             elif c == 'q':

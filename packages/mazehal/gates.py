@@ -12,6 +12,8 @@ logger=logging.getLogger('MazeGates')
 
 import adai2c as pwm
 
+# TODO Gates should be calibrated
+
 # motor | open       | close       | key | position
 # 0     | 220 -> 222 | 540 -> 534  | IUL | inner upper left 
 # 1     | 545 -> 535 | 195 -> 205  | IBL | inner bottom left
@@ -20,7 +22,7 @@ import adai2c as pwm
 # 4     | 520 -> 510 | 220 -> 222  | OBR | outter bottom right
 # 5     | 225 -> 230 | 550 -> 545  | OUR | outter upper right
 # 6     | 195 -> 200 | 500 -> 492  | IBR | inner bottom right
-# 7     | 545 -> 540 | 200 -> 205  | IUR | inner upper right
+# 7     | 542 -> 538 | 176 -> 182  | IUR | inner upper right
 
 
 #        /----------------\   /----------------\
@@ -42,7 +44,7 @@ pwmV = {'IUL': (0,[218, 228, 537, 530]),
         'OBR': (4,[520, 505, 205, 210]),
         'OUR': (5,[225, 240, 550, 535]),
         'IBR': (6,[195, 200, 500, 485]),
-        'IUR': (7,[535, 525, 200, 210]) }
+        'IUR': (7,[542, 538, 176, 182]) }
 
 
 class Motor(object):
