@@ -1,8 +1,11 @@
-# rat-maze
-Maze control for behavioural rat training
+# Maze control for behavioural rat training
+
+![maze](models3d/maze.png)
+
+# Installation
 
 
-# Install on raspberry pi 3
+## Raspberry pi 3
 
 Mazer-Service
 
@@ -16,6 +19,6 @@ systemctl enable mazer.service
 reboot
 
 
-#package needed 
+Package needed 
 numpy # for random numbers
 
